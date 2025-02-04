@@ -1,4 +1,4 @@
-import { RunTestCase } from '@/agent/usecases/runTestCase.js';
+import { RunTestCase } from '@/app/usecases/run-test-case.js';
 import { Command, program } from 'commander';
 import ora from 'ora';
 
