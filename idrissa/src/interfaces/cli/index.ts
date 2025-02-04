@@ -2,12 +2,11 @@
 
 import { Command } from 'commander';
 import { startTest } from './commands/index.js';
-import metadata from '../package.json' with { 'type': 'json' }
 
 const program = new Command();
 
 program
-    .version(metadata.version)
+    .version('1.0.0')
     .description('Magic Inspector API CLI')
 ;
 

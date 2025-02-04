@@ -1,3 +1,4 @@
+import { RunTestCase } from '@/agent/usecases/runTestCase.js';
 import { Command, program } from 'commander';
 import ora from 'ora';
 
@@ -13,11 +14,13 @@ export const startTest = new Command('test:start')
     ) => {
         const spinner = ora('Running tests...').start();
 
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        const runTestCase = new RunTestCase();
 
-        program.error('This command is not implemented yet');
+        await runTestCase.execute();
+
+        spinner.succeed('Tests completed');
     });
 
 export default {
-    startTest,
-};
+    startTest
+}
