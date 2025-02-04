@@ -16,13 +16,18 @@
   "description": "Your QA Engineer AI Agent",
   "devDependencies": {
     "@types/node": "^22.13.1",
+    "prettier": "3.4.2",
     "ts-node": "^10.9.2",
     "tsup": "^8.3.6",
     "typescript": "^5.7.3"
   },
   "dependencies": {
     "commander": "^13.1.0",
+    "langchain": "^0.3.15",
     "ora": "^8.2.0",
-    "tsconfig-paths": "^4.2.0"
+    "playwright": "^1.50.1",
+    "tsconfig-paths": "^4.2.0",
+    "zod": "^3.24.1",
+    "zod-to-json-schema": "^3.24.1"
   }
 }
