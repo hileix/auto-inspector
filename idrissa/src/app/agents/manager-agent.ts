@@ -2,16 +2,17 @@ import { Browser, Cookie, Page } from "playwright";
 import { Task, TaskManager } from "../task-manager";
 import { OpenAI4o } from "../../../../../openai-model";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
-import { AgentPrompt } from "./prompts";
-import { HumanPrompt } from "../human.prompt";
+import {
+  ManagerAgentPrompt,
+  ManagerAgentHumanPrompt,
+} from "./manager-system-prompt.js";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { Coordinates, DomNode, DomService } from "../dom.service";
 import { ManagerAction, ManagerResponse } from "./types";
-import { ReporterInterface } from "@/reporters/reporter";
-import { parseReadonlyDef } from "zod-to-json-schema";
 import { MagicAssistantThoughts } from "@/common/schema";
-import { Result } from "@/shared/result.type";
 import { BrowserService } from "@/infra/services/browser-service.js";
+import { DEFAULT_AGENT_RETRY_COUNT } from "@/domain/config/default.js";
+import { LLMService } from "@/infra/services/llm-service.js";
 
 export interface ManagerAgentReporter {
   updateScreenshot(): Promise<void>;
@@ -27,11 +28,11 @@ export class ManagerAgent {
   private reason: string = "";
 
   constructor(
-    private readonly page: Page,
     private readonly taskManager: TaskManager,
     private readonly domService: DomService,
     private readonly browserService: BrowserService,
     private readonly reporter?: ManagerAgentReporter,
+    private readonly llmService: LLMService,
   ) {}
 
   private onSuccess(reason: string) {
@@ -127,35 +128,33 @@ export class ManagerAgent {
 
     const parser = new JsonOutputParser<ManagerResponse>();
 
-    const prompt = new AgentPrompt(3).getSystemPrompt();
+    const systemMessage = new ManagerAgentPrompt(
+      DEFAULT_AGENT_RETRY_COUNT,
+    ).getSystemMessage();
 
     const { screenshot, domState, selectorMap, stringifiedDomState } =
       await this.domService.getInteractiveElements();
 
     this.reporter?.updateScreenshot();
 
-    const humanMessage = new HumanPrompt().getHumanMessage({
+    const humanMessage = new ManagerAgentHumanPrompt().getHumanMessage({
       serializedTasks: taskManager.getSerializedTasks(),
       screenshotUrl: screenshot,
       stringifiedDomState,
       pageUrl: this.browserService.getPageUrl(),
     });
 
-    const messages = [
-      new SystemMessage({
-        content: prompt,
-      }),
-      humanMessage,
-    ];
-
-    const response = await model.invoke(messages);
+    const messages = [systemMessage, humanMessage];
 
     try {
-      const parsedResponse = await parser.invoke(response);
+      const parsedResponse = await this.llmService.invokeAndParse(
+        messages,
+        parser,
+      );
 
       return parsedResponse;
     } catch (error) {
-      console.error("Error parsing response:", error);
+      console.error("Error parsing agent response:", error);
       return {
         currentState: {
           nextGoal: "Keep trying",
@@ -194,7 +193,6 @@ export class ManagerAgent {
 
     switch (action.name) {
       case "clickElement":
-        console.log("clickElement", action.params.index);
         coordinates = this.domService.getIndexSelector(action.params.index);
 
         if (!coordinates) {

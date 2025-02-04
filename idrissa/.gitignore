@@ -6,6 +6,10 @@ dist/
 build/
 out/
 
+# Ignore environment variable files
+.env.local
+.env
+
 # Ignore TypeScript declaration files
 *.d.ts
 

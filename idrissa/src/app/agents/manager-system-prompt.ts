@@ -2,6 +2,7 @@ import {
   JsonifiedManagerResponseSchema,
   ManagerResponseExamples,
 } from "@/domain/types/manager-agent-response.js";
+import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 export class ManagerAgentPrompt {
   constructor(private readonly maxActionPerStep: number) {}
@@ -146,5 +147,49 @@ export class ManagerAgentPrompt {
   
       Remember: Your responses must be valid JSON matching the specified format. Each action in the sequence must be valid."""
   `;
+  }
+
+  getSystemMessage() {
+    return new SystemMessage({
+      content: this.getSystemPrompt(),
+    });
+  }
+}
+
+export class ManagerAgentHumanPrompt {
+  constructor() {}
+
+  getHumanMessage({
+    serializedTasks,
+    stringifiedDomState,
+    screenshotUrl,
+    pageUrl,
+  }: {
+    serializedTasks: string;
+    stringifiedDomState: string;
+    screenshotUrl: string;
+    pageUrl: string;
+  }) {
+    return new HumanMessage({
+      content: [
+        {
+          type: "image_url",
+          image_url: {
+            url: screenshotUrl,
+            detail: "high",
+          },
+        },
+        {
+          type: "text",
+          text: `
+          CURRENT URL: ${pageUrl}
+
+          EXTRACTED DOM ELEMENTS: ${stringifiedDomState} that you can match with the screenshot.
+
+          TEST SCENARIO AND TASKS: ${serializedTasks}
+          `,
+        },
+      ],
+    });
   }
 }
