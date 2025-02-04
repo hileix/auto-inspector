@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "allowJs": true,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+
+    /* ✅ Strict Type Checking */
+    "noImplicitAny": true,              
+    "strictNullChecks": true,           
+    "strictPropertyInitialization": true,
+    "noUncheckedIndexedAccess": true,    
+    "noImplicitReturns": true,          
+    "noFallthroughCasesInSwitch": true, 
+
+    /* ✅ Type Safety Enhancements */
+    "noImplicitOverride": true,          
+    "noImplicitThis": true,              
+    "useUnknownInCatchVariables": true,  
+    "exactOptionalPropertyTypes": true,  
+
+    /* ✅ Ensure Robustness */
+    "forceConsistentCasingInFileNames": true,
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

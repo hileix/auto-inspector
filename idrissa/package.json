@@ -1,0 +1,22 @@
+{
+  "name": "idrissa",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist/index.js"
+  },
+  "author": "Kevin Piacentini <kevin@agentlabs.dev>",
+  "license": "Apache License Version 2.0",
+  "description": "Your QA Engineer AI Agent",
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "commander": "^13.1.0",
+    "ora": "^8.2.0"
+  }
+}
