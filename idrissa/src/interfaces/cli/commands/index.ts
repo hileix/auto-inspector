@@ -15,26 +15,26 @@ export const startTest = new Command("test:start")
   .option("-u, --url <URL>", "The webpage to start testing")
   .option("-d, --description <DESCRIPTION>", "The description of the test")
   .action(async (options: { url: string; description: string }) => {
-    const spinner = ora("Running tests...").start();
+    // const spinner = ora("Running tests...").start();
 
     const runTestCase = new RunTestCase();
 
     if (!options.url) {
-      spinner.fail("URL is required");
+      //   spinner.fail("URL is required");
       return;
     }
 
     if (!options.description) {
-      spinner.fail("Description is required");
+      //   spinner.fail("Description is required");
       return;
     }
 
     const result = await runTestCase.execute(options.url, options.description);
 
     if (result.status === "success") {
-      spinner.succeed("Tests completed");
+      console.log("✅ Tests completed successfully!");
     } else {
-      spinner.fail("Tests failed");
+      console.log("❌ Tests failed");
     }
   });
 

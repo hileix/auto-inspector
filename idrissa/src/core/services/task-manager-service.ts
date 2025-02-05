@@ -28,8 +28,4 @@ export class TaskManagerService {
       latestTaskCompleted: this.getLatestTask()?.asObject(),
     });
   }
-
-  getTasksForReport() {
-    return this.tasks.map((task) => task.asObject());
-  }
 }

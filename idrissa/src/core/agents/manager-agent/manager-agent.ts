@@ -73,11 +73,6 @@ export class ManagerAgent {
     this.reporter.info(message);
   }
 
-  private async reportProgress() {
-    const thoughts = this.taskManager.getTasksForReport();
-    this.reporter.reportProgress(thoughts);
-  }
-
   private async reportAction(action: ManagerAgentAction) {
     this.info(`[Performing action...]: ${JSON.stringify(action.name)}`);
   }
@@ -92,7 +87,6 @@ export class ManagerAgent {
 
   private async afterAction(action: ManagerAgentAction) {
     await this.reportActionDone(action);
-    await this.reportProgress();
   }
 
   private async incrementRetries() {
@@ -132,9 +126,11 @@ export class ManagerAgent {
           });
         }
 
+        await this.reporter.reportProgress(true);
+
         const task = await this.defineNextTask();
 
-        await this.reportProgress();
+        await this.reporter.reportProgress(false, task);
 
         await this.executeTask(task);
       }
@@ -203,7 +199,7 @@ export class ManagerAgent {
 
     this.taskManager.add(task);
 
-    this.reportProgress();
+    this.reporter.reportProgress(false, task);
   }
 
   private async executeAction(action: ManagerAgentAction) {
@@ -230,7 +226,6 @@ export class ManagerAgent {
         break;
 
       case "fillInput":
-        console.log("fillInput", action.params.index);
         coordinates = this.domService.getIndexSelector(action.params.index);
 
         if (!coordinates) {

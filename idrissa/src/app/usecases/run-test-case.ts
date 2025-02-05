@@ -5,12 +5,12 @@ import { OpenAI4o } from "@/infra/services/openai4o";
 import { InMemoryFileSystem } from "@/infra/services/in-memory-file-system";
 import { PlaywrightScreenshoter } from "@/infra/services/playwright-screenshotter";
 import { ChromiumBrowser } from "@/infra/services/chromium-browser";
-import { LogReporter } from "@/infra/services/log-reporter";
 import { EvaluationAgent } from "@/core/agents/evaluation-agent/evaluation-agent";
 import {
   DEFAULT_AGENT_MAX_ACTIONS_PER_TASK,
   DEFAULT_AGENT_MAX_RETRIES,
 } from "@/core/agents/manager-agent/manager-agent.config";
+import { OraReporter } from "@/infra/services/ora-reporter";
 
 export class RunTestCase {
   async execute(startUrl: string, initialPrompt: string) {
@@ -19,7 +19,7 @@ export class RunTestCase {
     const browser = new ChromiumBrowser();
 
     const llm = new OpenAI4o();
-    const reporter = new LogReporter();
+    const reporter = new OraReporter();
 
     const evaluationAgent = new EvaluationAgent(
       llm,

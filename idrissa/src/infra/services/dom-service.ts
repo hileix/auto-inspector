@@ -237,7 +237,6 @@ export class DomService {
         console.error("Failed to draw highlight circle:", e);
       }
     }, coordinates);
-    console.log("highlightElementPointer done");
   }
 
   async waitForStability(page: Page) {
