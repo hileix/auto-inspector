@@ -5,27 +5,57 @@ import {
   ManagerAgentHumanPrompt,
 } from "./manager-agent.prompt";
 import { DomService } from "@/infra/services/dom-service";
-import { DEFAULT_AGENT_RETRY_COUNT } from "./manager-agent.config";
+import {
+  DEFAULT_AGENT_MAX_ACTIONS_PER_TASK,
+  DEFAULT_AGENT_MAX_RETRIES,
+} from "./manager-agent.config";
 import { ManagerAgentAction, ManagerResponse } from "./manager-agent.types";
 import { Reporter } from "@/core/interfaces/reporter.interface";
 import { Browser, Coordinates } from "@/core/interfaces/browser.interface";
-import { LLM } from "@/core/interfaces/llm.interface";
 import { EvaluationAgent } from "../evaluation-agent/evaluation-agent";
 import { Task } from "@/core/entities/task";
+import { LLM } from "@/core/interfaces/llm.interface";
+
+export type ManagerAgentConfig = {
+  maxActionsPerTask?: number;
+  maxRetries?: number;
+
+  taskManager: TaskManagerService;
+  domService: DomService;
+  browserService: Browser;
+  llmService: LLM;
+  evaluator: EvaluationAgent;
+  reporter: Reporter;
+};
 
 export class ManagerAgent {
   private isSuccess: boolean = false;
   private isFailure: boolean = false;
   private reason: string = "";
+  private retries: number = 0;
 
-  constructor(
-    private readonly taskManager: TaskManagerService,
-    private readonly domService: DomService,
-    private readonly browserService: Browser,
-    private readonly llmService: LLM,
-    private readonly reporter: Reporter,
-    private readonly evaluator: EvaluationAgent,
-  ) {}
+  private readonly maxActionsPerTask: number;
+  private readonly maxRetries: number;
+
+  private readonly taskManager: TaskManagerService;
+  private readonly domService: DomService;
+  private readonly browserService: Browser;
+  private readonly llmService: LLM;
+  private readonly reporter: Reporter;
+  private readonly evaluator: EvaluationAgent;
+
+  constructor(config: ManagerAgentConfig) {
+    this.taskManager = config.taskManager;
+    this.domService = config.domService;
+    this.browserService = config.browserService;
+    this.llmService = config.llmService;
+    this.reporter = config.reporter;
+    this.evaluator = config.evaluator;
+
+    this.maxActionsPerTask =
+      config.maxActionsPerTask ?? DEFAULT_AGENT_MAX_ACTIONS_PER_TASK;
+    this.maxRetries = config.maxRetries ?? DEFAULT_AGENT_MAX_RETRIES;
+  }
 
   private onSuccess(reason: string) {
     this.reporter.success(`Manager agent completed successfully: ${reason}`);
@@ -65,6 +95,14 @@ export class ManagerAgent {
     await this.reportProgress();
   }
 
+  private async incrementRetries() {
+    this.retries += 1;
+  }
+
+  private async resetRetries() {
+    this.retries = 0;
+  }
+
   get isCompleted() {
     return this.isSuccess || this.isFailure;
   }
@@ -81,10 +119,19 @@ export class ManagerAgent {
     status: "success" | "failure";
     reason: string;
   }> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
       this.reporter?.info("Starting manager agent");
 
       while (!this.isCompleted) {
+        if (this.retries >= this.maxRetries) {
+          this.onFailure("Max retries reached");
+
+          return resolve({
+            status: "failure",
+            reason: "Max retries reached",
+          });
+        }
+
         const task = await this.defineNextTask();
 
         await this.reportProgress();
@@ -92,7 +139,7 @@ export class ManagerAgent {
         await this.executeTask(task);
       }
 
-      resolve({
+      return resolve({
         status: this.isSuccess ? "success" : "failure",
         reason: this.reason,
       });
@@ -103,7 +150,7 @@ export class ManagerAgent {
     const parser = new JsonOutputParser<ManagerResponse>();
 
     const systemMessage = new ManagerAgentPrompt(
-      DEFAULT_AGENT_RETRY_COUNT,
+      this.maxActionsPerTask,
     ).getSystemMessage();
 
     const { screenshot, stringifiedDomState } =
@@ -148,8 +195,10 @@ export class ManagerAgent {
 
     if (isCompleted) {
       task.complete(reason);
+      this.resetRetries();
     } else {
       task.fail(reason);
+      this.incrementRetries();
     }
 
     this.taskManager.add(task);

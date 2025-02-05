@@ -7,6 +7,10 @@ import { PlaywrightScreenshoter } from "@/infra/services/playwright-screenshotte
 import { ChromiumBrowser } from "@/infra/services/chromium-browser";
 import { LogReporter } from "@/infra/services/log-reporter";
 import { EvaluationAgent } from "@/core/agents/evaluation-agent/evaluation-agent";
+import {
+  DEFAULT_AGENT_MAX_ACTIONS_PER_TASK,
+  DEFAULT_AGENT_MAX_RETRIES,
+} from "@/core/agents/manager-agent/manager-agent.config";
 
 export class RunTestCase {
   async execute(startUrl: string, initialPrompt: string) {
@@ -23,14 +27,16 @@ export class RunTestCase {
       screenshotService,
     );
 
-    const managerAgent = new ManagerAgent(
-      new TaskManagerService(),
-      new DomService(screenshotService, browser),
-      browser,
-      llm,
+    const managerAgent = new ManagerAgent({
+      taskManager: new TaskManagerService(),
+      domService: new DomService(screenshotService, browser),
+      browserService: browser,
+      llmService: llm,
       reporter,
-      evaluationAgent,
-    );
+      evaluator: evaluationAgent,
+      maxActionsPerTask: DEFAULT_AGENT_MAX_ACTIONS_PER_TASK,
+      maxRetries: DEFAULT_AGENT_MAX_RETRIES,
+    });
 
     const result = await managerAgent.launch(startUrl, initialPrompt);
 
