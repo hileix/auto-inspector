@@ -5,6 +5,7 @@ import { BrowserService } from "@/infra/services/browser-service";
 import { LLMService } from "@/infra/services/llm-service";
 import { FileSystemService } from "@/infra/services/file-system.service";
 import { ScreenshotService } from "@/infra/services/screenshot-service";
+import { LogReporter } from "@/infra/services/log-reporter";
 
 export class RunTestCase {
   async execute(startUrl: string, initialPrompt: string) {
@@ -17,6 +18,7 @@ export class RunTestCase {
       new DomService(screenshotService, browserService),
       browserService,
       new LLMService(),
+      new LogReporter(),
     );
 
     const result = await managerAgent.launch(startUrl, initialPrompt);

@@ -9,14 +9,7 @@ import { BrowserService, Coordinates } from "@/infra/services/browser-service";
 import { LLMService } from "@/infra/services/llm-service";
 import { DEFAULT_AGENT_RETRY_COUNT } from "./manager-agent.config";
 import { ManagerAgentAction, ManagerResponse } from "./manager-agent.types";
-
-export interface ManagerAgentReporter {
-  updateScreenshot(): Promise<void>;
-  reportProgress(task: any): void;
-  info(message: string): void;
-  success(message: string): void;
-  error(message: string): void;
-}
+import { ManagerAgentReporter } from "@/core/interfaces/manager-agent-reporter.interface";
 
 export class ManagerAgent {
   private isSuccess: boolean = false;
@@ -47,14 +40,6 @@ export class ManagerAgent {
     this.reporter?.info(message);
   }
 
-  private async success(message: string) {
-    this.reporter?.success(message);
-  }
-
-  private async error(message: string) {
-    this.reporter?.error(message);
-  }
-
   private async reportProgress() {
     const thoughts = this.taskManager.getTasksForReport();
     this.reporter?.reportProgress(thoughts);
@@ -70,12 +55,10 @@ export class ManagerAgent {
 
   private async beforeAction(action: ManagerAgentAction) {
     await this.reportAction(action);
-    await this.reporter?.updateScreenshot();
   }
 
   private async afterAction(action: ManagerAgentAction) {
     await this.reportActionDone(action);
-    await this.reporter?.updateScreenshot();
     await this.reportProgress();
   }
 
@@ -130,8 +113,6 @@ export class ManagerAgent {
 
     const { screenshot, stringifiedDomState } =
       await this.domService.getInteractiveElements();
-
-    this.reporter?.updateScreenshot();
 
     const humanMessage = new ManagerAgentHumanPrompt().getHumanMessage({
       serializedTasks: taskManager.getSerializedTasks(),
