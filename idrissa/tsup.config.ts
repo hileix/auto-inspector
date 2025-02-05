@@ -5,7 +5,7 @@ export default defineConfig({
   format: ["esm"],
   outDir: "dist",
   sourcemap: true,
-  dts: true,
+  platform: "node", // Ensures built-in Node modules are not bundled
   esbuildOptions(options) {
     options.alias = {
       "@": "./src",

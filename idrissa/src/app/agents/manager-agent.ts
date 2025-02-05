@@ -1,22 +1,21 @@
-import { Browser, Cookie, Page } from "playwright";
-import { Task, TaskManager } from "../task-manager";
-import { OpenAI4o } from "../../../../../openai-model";
+import { TaskManagerService } from "@/core/services/task-manager-service.js";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import {
   ManagerAgentPrompt,
   ManagerAgentHumanPrompt,
-} from "./manager-system-prompt.js";
-import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { Coordinates, DomNode, DomService } from "../dom.service";
-import { ManagerAction, ManagerResponse } from "./types";
-import { MagicAssistantThoughts } from "@/common/schema";
-import { BrowserService } from "@/infra/services/browser-service.js";
-import { DEFAULT_AGENT_RETRY_COUNT } from "@/domain/config/default.js";
+} from "./manager-agent.prompt.js";
+import { DomService } from "@/infra/services/dom-service.js";
+import {
+  BrowserService,
+  Coordinates,
+} from "@/infra/services/browser-service.js";
 import { LLMService } from "@/infra/services/llm-service.js";
+import { DEFAULT_AGENT_RETRY_COUNT } from "./manager-agent.config.js";
+import { ManagerAgentAction, ManagerResponse } from "./manager-agent.types.js";
 
 export interface ManagerAgentReporter {
   updateScreenshot(): Promise<void>;
-  reportProgress(task: MagicAssistantThoughts[]): void;
+  reportProgress(task: any): void;
   info(message: string): void;
   success(message: string): void;
   error(message: string): void;
@@ -28,11 +27,11 @@ export class ManagerAgent {
   private reason: string = "";
 
   constructor(
-    private readonly taskManager: TaskManager,
+    private readonly taskManager: TaskManagerService,
     private readonly domService: DomService,
     private readonly browserService: BrowserService,
-    private readonly reporter?: ManagerAgentReporter,
     private readonly llmService: LLMService,
+    private readonly reporter?: ManagerAgentReporter,
   ) {}
 
   private onSuccess(reason: string) {
@@ -64,20 +63,20 @@ export class ManagerAgent {
     this.reporter?.reportProgress(thoughts);
   }
 
-  private async reportAction(action: ManagerAction) {
+  private async reportAction(action: ManagerAgentAction) {
     this.info(`[Performing action...]: ${JSON.stringify(action.name)}`);
   }
 
-  private async reportActionDone(action: ManagerAction) {
+  private async reportActionDone(action: ManagerAgentAction) {
     this.info(`[Action done...]: ${JSON.stringify(action.name)}`);
   }
 
-  private async beforeAction(action: ManagerAction) {
+  private async beforeAction(action: ManagerAgentAction) {
     await this.reportAction(action);
     await this.reporter?.updateScreenshot();
   }
 
-  private async afterAction(action: ManagerAction) {
+  private async afterAction(action: ManagerAgentAction) {
     await this.reportActionDone(action);
     await this.reporter?.updateScreenshot();
     await this.reportProgress();
@@ -87,8 +86,10 @@ export class ManagerAgent {
     return this.isSuccess || this.isFailure;
   }
 
-  async init(initialPrompt: string) {
-    this.taskManager.initWithEndGoal(initialPrompt);
+  async launch(startUrl: string, initialPrompt: string) {
+    await this.browserService.launch(startUrl);
+
+    this.taskManager.setEndGoal(initialPrompt);
 
     return this.run();
   }
@@ -123,16 +124,14 @@ export class ManagerAgent {
     });
   }
 
-  async evaluateTasks(taskManager: TaskManager) {
-    const model = OpenAI4o();
-
+  async evaluateTasks(taskManager: TaskManagerService) {
     const parser = new JsonOutputParser<ManagerResponse>();
 
     const systemMessage = new ManagerAgentPrompt(
       DEFAULT_AGENT_RETRY_COUNT,
     ).getSystemMessage();
 
-    const { screenshot, domState, selectorMap, stringifiedDomState } =
+    const { screenshot, stringifiedDomState } =
       await this.domService.getInteractiveElements();
 
     this.reporter?.updateScreenshot();
@@ -164,7 +163,7 @@ export class ManagerAgent {
     }
   }
 
-  async executeActions(goal: string, actions: ManagerAction[]) {
+  async executeActions(goal: string, actions: ManagerAgentAction[]) {
     for (const action of actions) {
       try {
         await this.executeAction(action);
@@ -172,7 +171,6 @@ export class ManagerAgent {
         this.taskManager.addCompletedTask({
           goal,
           actions: actions,
-          status: "failed",
         });
         return;
       }
@@ -181,12 +179,11 @@ export class ManagerAgent {
     this.taskManager.addCompletedTask({
       goal,
       actions: actions,
-      status: "completed",
     });
     this.reportProgress();
   }
 
-  private async executeAction(action: ManagerAction) {
+  private async executeAction(action: ManagerAgentAction) {
     let coordinates: Coordinates | null = null;
 
     await this.beforeAction(action);
@@ -240,7 +237,7 @@ export class ManagerAgent {
 
       case "takeScreenshot":
         await this.domService.resetHighlightElements();
-        await this.domService.highlightForSoM(this.browserService.getPage());
+        await this.domService.highlightForSoM();
         break;
 
       case "goToUrl":

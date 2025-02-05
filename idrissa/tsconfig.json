@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "target": "ESNext",
+    "target": "esnext",
     "outDir": "dist",
     "rootDir": "src",
     "strict": true,
@@ -15,7 +15,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "baseUrl": ".",
+    "baseUrl": "./",
 
     /* ✅ Strict Type Checking */
     "noImplicitAny": true,

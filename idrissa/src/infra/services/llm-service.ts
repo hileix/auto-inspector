@@ -3,14 +3,6 @@ import { BaseMessage } from "@langchain/core/messages";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import "dotenv/config";
 
-const OpenAI4oMini = () => {
-  return new ChatOpenAI({
-    model: "gpt-4o-mini",
-    temperature: 0,
-    openAIApiKey: process.env.OPENAI_API_KEY!,
-  });
-};
-
 const OpenAI4o = () => {
   return new ChatOpenAI({
     model: "gpt-4o",
@@ -22,8 +14,8 @@ const OpenAI4o = () => {
 export class LLMService {
   private model: ChatOpenAI;
 
-  constructor(model: ChatOpenAI) {
-    this.model = model;
+  constructor() {
+    this.model = OpenAI4o();
   }
 
   async invokeAndParse<T extends Record<string, any>>(
