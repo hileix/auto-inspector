@@ -47,7 +47,6 @@ export class EvaluationAgentHumanPrompt {
     pageUrl,
   }: {
     serializedTask: string;
-    stringifiedDomState: string;
     screenshotUrl: string;
     pageUrl: string;
   }) {

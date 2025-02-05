@@ -1,7 +1,7 @@
 import {
   JsonifiedManagerResponseSchema,
   ManagerResponseExamples,
-} from "../../app/agents/manager-agent.types";
+} from "@/core/agents/manager-agent/manager-agent.types";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 
 export class ManagerAgentPrompt {

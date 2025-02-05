@@ -1,6 +1,6 @@
-import { ElementHandle, Page } from "playwright";
-import { ScreenshotService } from "./screenshot-service";
-import { BrowserService } from "./browser-service";
+import { Page } from "playwright";
+import { Browser } from "@/core/interfaces/browser.interface";
+import { Screenshotter } from "@/core/interfaces/screenshotter.interface";
 
 declare global {
   interface Window {
@@ -80,8 +80,8 @@ export class DomService {
   };
 
   constructor(
-    private readonly screenshotService: ScreenshotService,
-    private readonly browserService: BrowserService,
+    private readonly screenshotService: Screenshotter,
+    private readonly browserService: Browser,
   ) {}
 
   getIndexSelector(index: number): Coordinates | null {
@@ -408,8 +408,6 @@ export class DomService {
           return segments.join("/");
         }
 
-        console.log(" HERE 3");
-
         function isElementAccepted(element: Element) {
           const leafElementDenyList = new Set([
             "svg",
@@ -420,8 +418,6 @@ export class DomService {
           ]);
           return !leafElementDenyList.has(element.tagName.toLowerCase());
         }
-
-        console.log(" HERE 4");
 
         function isInteractiveElement(element: HTMLElement) {
           const interactiveElements = new Set([
@@ -565,8 +561,6 @@ export class DomService {
             hasAriaProps || hasClickHandler || hasClickListeners || isDraggable
           );
         }
-
-        console.log(" HERE 3");
 
         function isElementVisible(element: HTMLElement) {
           const style = window.getComputedStyle(element);
@@ -843,8 +837,6 @@ export class DomService {
 
         return domTree;
       });
-
-      console.log("domState");
 
       return domState;
     } catch (error: unknown) {

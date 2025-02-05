@@ -2,20 +2,17 @@ import { ChatOpenAI } from "@langchain/openai";
 import { BaseMessage } from "@langchain/core/messages";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import "dotenv/config";
+import { LLM } from "@/core/interfaces/llm.interface";
 
-const OpenAI4o = () => {
-  return new ChatOpenAI({
-    model: "gpt-4o",
-    temperature: 0,
-    openAIApiKey: process.env.OPENAI_API_KEY!,
-  });
-};
-
-export class LLMService {
+export class OpenAI4o implements LLM {
   private model: ChatOpenAI;
 
   constructor() {
-    this.model = OpenAI4o();
+    this.model = new ChatOpenAI({
+      model: "gpt-4o",
+      temperature: 0,
+      openAIApiKey: process.env.OPENAI_API_KEY!,
+    });
   }
 
   async invokeAndParse<T extends Record<string, any>>(

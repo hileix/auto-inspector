@@ -1,6 +1,6 @@
-import { ManagerAgentReporter } from "@/core/interfaces/manager-agent-reporter.interface";
+import { Reporter } from "@/core/interfaces/reporter.interface";
 
-export class LogReporter implements ManagerAgentReporter {
+export class LogReporter implements Reporter {
   reportProgress(task: any): void {
     console.log(task);
   }

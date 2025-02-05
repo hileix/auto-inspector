@@ -1,3 +1,4 @@
+import { Browser } from "@/core/interfaces/browser.interface";
 import { Page, chromium } from "playwright";
 
 export type Coordinates = {
@@ -5,7 +6,7 @@ export type Coordinates = {
   y: number;
 };
 
-export class BrowserService {
+export class ChromiumBrowser implements Browser {
   private page: Page | null = null;
 
   constructor() {}

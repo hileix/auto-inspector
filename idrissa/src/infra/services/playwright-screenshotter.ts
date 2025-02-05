@@ -1,8 +1,9 @@
-import { FileSystemInterface } from "@/core/interfaces/file-system.interface";
+import { FileSystem } from "@/core/interfaces/file-system.interface";
+import { Screenshotter } from "@/core/interfaces/screenshotter.interface";
 import { Page } from "playwright";
 
-export class ScreenshotService {
-  constructor(private readonly fileSystem: FileSystemInterface) {}
+export class PlaywrightScreenshoter implements Screenshotter {
+  constructor(private readonly fileSystem: FileSystem) {}
 
   async takeScreenshot(page: Page) {
     const screenshot = await page.screenshot({

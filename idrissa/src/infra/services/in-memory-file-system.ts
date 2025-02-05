@@ -1,6 +1,6 @@
-import { FileSystemInterface } from "@/core/interfaces/file-system.interface";
+import { FileSystem } from "@/core/interfaces/file-system.interface";
 
-export class FileSystemService implements FileSystemInterface {
+export class InMemoryFileSystem implements FileSystem {
   constructor() {}
 
   saveFile(path: string, data: Buffer): Promise<string> {

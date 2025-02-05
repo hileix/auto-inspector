@@ -5,11 +5,11 @@ import {
   ManagerAgentHumanPrompt,
 } from "./manager-agent.prompt";
 import { DomService } from "@/infra/services/dom-service";
-import { BrowserService, Coordinates } from "@/infra/services/browser-service";
-import { LLMService } from "@/infra/services/llm-service";
 import { DEFAULT_AGENT_RETRY_COUNT } from "./manager-agent.config";
 import { ManagerAgentAction, ManagerResponse } from "./manager-agent.types";
-import { ManagerAgentReporter } from "@/core/interfaces/manager-agent-reporter.interface";
+import { Reporter } from "@/core/interfaces/reporter.interface";
+import { Browser, Coordinates } from "@/core/interfaces/browser.interface";
+import { LLM } from "@/core/interfaces/llm.interface";
 
 export class ManagerAgent {
   private isSuccess: boolean = false;
@@ -19,30 +19,30 @@ export class ManagerAgent {
   constructor(
     private readonly taskManager: TaskManagerService,
     private readonly domService: DomService,
-    private readonly browserService: BrowserService,
-    private readonly llmService: LLMService,
-    private readonly reporter?: ManagerAgentReporter,
+    private readonly browserService: Browser,
+    private readonly llmService: LLM,
+    private readonly reporter: Reporter,
   ) {}
 
   private onSuccess(reason: string) {
-    this.reporter?.success(`Manager agent completed successfully: ${reason}`);
+    this.reporter.success(`Manager agent completed successfully: ${reason}`);
     this.isSuccess = true;
     this.reason = reason;
   }
 
   private onFailure(reason: string) {
-    this.reporter?.error(`Manager agent failed: ${reason}`);
+    this.reporter.error(`Manager agent failed: ${reason}`);
     this.isFailure = true;
     this.reason = reason;
   }
 
   private async info(message: string) {
-    this.reporter?.info(message);
+    this.reporter.info(message);
   }
 
   private async reportProgress() {
     const thoughts = this.taskManager.getTasksForReport();
-    this.reporter?.reportProgress(thoughts);
+    this.reporter.reportProgress(thoughts);
   }
 
   private async reportAction(action: ManagerAgentAction) {
