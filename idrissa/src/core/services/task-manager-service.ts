@@ -1,4 +1,4 @@
-import { ManagerAgentAction } from "@/app/agents/manager-agent.types.js";
+import { ManagerAgentAction } from "@/app/agents/manager-agent.types";
 
 export interface Task {
   id: string;

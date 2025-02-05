@@ -1,6 +1,6 @@
-import { RunTestCase } from "@/app/usecases/run-test-case.js";
+import { RunTestCase } from "@/app/usecases/run-test-case";
 import { Command, program } from "commander";
-import ora from "ora";
+import ora from "ora-classic";
 import "dotenv/config";
 
 if (!process.env.OPENAI_API_KEY) {

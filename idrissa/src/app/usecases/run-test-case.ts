@@ -1,10 +1,10 @@
-import { TaskManagerService } from "@/core/services/task-manager-service.js";
-import { ManagerAgent } from "../agents/manager-agent.js";
-import { DomService } from "@/infra/services/dom-service.js";
-import { BrowserService } from "@/infra/services/browser-service.js";
-import { LLMService } from "@/infra/services/llm-service.js";
-import { FileSystemService } from "@/infra/services/file-system.service.js";
-import { ScreenshotService } from "@/infra/services/screenshot-service.js";
+import { TaskManagerService } from "@/core/services/task-manager-service";
+import { ManagerAgent } from "../agents/manager-agent";
+import { DomService } from "@/infra/services/dom-service";
+import { BrowserService } from "@/infra/services/browser-service";
+import { LLMService } from "@/infra/services/llm-service";
+import { FileSystemService } from "@/infra/services/file-system.service";
+import { ScreenshotService } from "@/infra/services/screenshot-service";
 
 export class RunTestCase {
   async execute(startUrl: string, initialPrompt: string) {

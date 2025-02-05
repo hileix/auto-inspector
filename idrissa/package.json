@@ -1,16 +1,13 @@
 {
   "name": "idrissa",
   "version": "1.0.0",
-  "type": "module",
   "main": "dist/index.js",
   "bin": {
     "mycli": "dist/index.js"
   },
   "scripts": {
     "dev": "tsup --watch",
-    "cli": "tsup && node dist/index test:start --url=https://www.google.com --description='Test the search bar'",
-    "cli2": "tsx src/interfaces/cli/index.ts test:start --url=https://www.google.com --description='Test the search bar'",
-    "cli3": "tsc && node --loader ts-node/esm dist/interfaces/cli/index.js test:start --url=https://www.google.com --description='Test the search bar'",
+    "start": "ts-node -r tsconfig-paths/register src/interfaces/cli/index.ts test:start --url=https://www.google.com --description='Test the search bar'",
     "clean": "rm -rf dist"
   },
   "author": "Kevin Piacentini <kevin@agentlabs.dev>",
@@ -29,6 +26,7 @@
     "dotenv": "^16.4.7",
     "langchain": "^0.3.15",
     "ora": "^8.2.0",
+    "ora-classic": "^5.4.2",
     "playwright": "^1.48.1",
     "zod": "^3.24.1",
     "zod-to-json-schema": "^3.24.1"

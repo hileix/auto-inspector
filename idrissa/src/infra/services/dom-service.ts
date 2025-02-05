@@ -1,6 +1,6 @@
 import { ElementHandle, Page } from "playwright";
-import { ScreenshotService } from "./screenshot.service";
-import { BrowserService } from "./browser-service.js";
+import { ScreenshotService } from "./screenshot-service";
+import { BrowserService } from "./browser-service";
 
 declare global {
   interface Window {

@@ -1,4 +1,4 @@
-import { FileSystemInterface } from "@/core/interfaces/file-system.interface.js";
+import { FileSystemInterface } from "@/core/interfaces/file-system.interface";
 
 export class FileSystemService implements FileSystemInterface {
   constructor() {}

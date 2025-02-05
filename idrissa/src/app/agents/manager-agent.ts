@@ -1,17 +1,14 @@
-import { TaskManagerService } from "@/core/services/task-manager-service.js";
+import { TaskManagerService } from "@/core/services/task-manager-service";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import {
   ManagerAgentPrompt,
   ManagerAgentHumanPrompt,
-} from "./manager-agent.prompt.js";
-import { DomService } from "@/infra/services/dom-service.js";
-import {
-  BrowserService,
-  Coordinates,
-} from "@/infra/services/browser-service.js";
-import { LLMService } from "@/infra/services/llm-service.js";
-import { DEFAULT_AGENT_RETRY_COUNT } from "./manager-agent.config.js";
-import { ManagerAgentAction, ManagerResponse } from "./manager-agent.types.js";
+} from "./manager-agent.prompt";
+import { DomService } from "@/infra/services/dom-service";
+import { BrowserService, Coordinates } from "@/infra/services/browser-service";
+import { LLMService } from "@/infra/services/llm-service";
+import { DEFAULT_AGENT_RETRY_COUNT } from "./manager-agent.config";
+import { ManagerAgentAction, ManagerResponse } from "./manager-agent.types";
 
 export interface ManagerAgentReporter {
   updateScreenshot(): Promise<void>;

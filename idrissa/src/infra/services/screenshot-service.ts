@@ -1,4 +1,4 @@
-import { FileSystemInterface } from "@/core/interfaces/file-system.interface.js";
+import { FileSystemInterface } from "@/core/interfaces/file-system.interface";
 import { Page } from "playwright";
 
 export class ScreenshotService {
