@@ -10,6 +10,8 @@ import { ManagerAgentAction, ManagerResponse } from "./manager-agent.types";
 import { Reporter } from "@/core/interfaces/reporter.interface";
 import { Browser, Coordinates } from "@/core/interfaces/browser.interface";
 import { LLM } from "@/core/interfaces/llm.interface";
+import { EvaluationAgent } from "../evaluation-agent/evaluation-agent";
+import { Task } from "@/core/entities/task";
 
 export class ManagerAgent {
   private isSuccess: boolean = false;
@@ -22,6 +24,7 @@ export class ManagerAgent {
     private readonly browserService: Browser,
     private readonly llmService: LLM,
     private readonly reporter: Reporter,
+    private readonly evaluator: EvaluationAgent,
   ) {}
 
   private onSuccess(reason: string) {
@@ -82,19 +85,11 @@ export class ManagerAgent {
       this.reporter?.info("Starting manager agent");
 
       while (!this.isCompleted) {
-        const response = await this.evaluateTasks(this.taskManager);
-
-        this.taskManager.addPendingTask({
-          goal: response.currentState.nextGoal,
-          actions: response.actions,
-        });
+        const task = await this.defineNextTask();
 
         await this.reportProgress();
 
-        await this.executeActions(
-          response.currentState.nextGoal,
-          response.actions,
-        );
+        await this.executeTask(task);
       }
 
       resolve({
@@ -104,7 +99,7 @@ export class ManagerAgent {
     });
   }
 
-  async evaluateTasks(taskManager: TaskManagerService) {
+  async defineNextTask(): Promise<Task> {
     const parser = new JsonOutputParser<ManagerResponse>();
 
     const systemMessage = new ManagerAgentPrompt(
@@ -115,7 +110,7 @@ export class ManagerAgent {
       await this.domService.getInteractiveElements();
 
     const humanMessage = new ManagerAgentHumanPrompt().getHumanMessage({
-      serializedTasks: taskManager.getSerializedTasks(),
+      serializedTasks: this.taskManager.getSerializedTasks(),
       screenshotUrl: screenshot,
       stringifiedDomState,
       pageUrl: this.browserService.getPageUrl(),
@@ -129,35 +124,36 @@ export class ManagerAgent {
         parser,
       );
 
-      return parsedResponse;
+      return Task.InitPending(
+        parsedResponse.currentState.nextGoal,
+        parsedResponse.actions,
+      );
     } catch (error) {
       console.error("Error parsing agent response:", error);
-      return {
-        currentState: {
-          nextGoal: "Keep trying",
-        },
-        actions: [],
-      };
+      return Task.InitPending("Keep trying", []);
     }
   }
 
-  async executeActions(goal: string, actions: ManagerAgentAction[]) {
-    for (const action of actions) {
+  async executeTask(task: Task) {
+    for (const action of task.actions) {
       try {
         await this.executeAction(action);
       } catch (error) {
-        this.taskManager.addCompletedTask({
-          goal,
-          actions: actions,
-        });
-        return;
+        console.log("Error executing action", error);
       }
     }
 
-    this.taskManager.addCompletedTask({
-      goal,
-      actions: actions,
-    });
+    const { isCompleted, reason } =
+      await this.evaluator.evaluateTaskCompletion(task);
+
+    if (isCompleted) {
+      task.complete(reason);
+    } else {
+      task.fail(reason);
+    }
+
+    this.taskManager.add(task);
+
     this.reportProgress();
   }
 

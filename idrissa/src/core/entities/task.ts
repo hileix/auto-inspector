@@ -1,19 +1,28 @@
 import { ManagerAgentAction } from "@/core/agents/manager-agent/manager-agent.types";
 
-export type InitTaskParams = {
-  id: string;
-  goal: string;
-  actions: ManagerAgentAction[];
-  status: "pending" | "completed" | "failed";
-};
-
 export class Task {
+  private reason?: string;
+
   constructor(
-    private readonly id: string,
-    private readonly goal: string,
-    private readonly actions: ManagerAgentAction[],
-    private readonly status: "pending" | "completed" | "failed",
+    private id: string,
+    private goal: string,
+    readonly actions: ManagerAgentAction[],
+    private status: "pending" | "completed" | "failed",
   ) {}
+
+  static InitPending(goal: string, actions: ManagerAgentAction[]) {
+    return new Task(crypto.randomUUID(), goal, actions, "pending");
+  }
+
+  complete(reason: string) {
+    this.status = "completed";
+    this.reason = reason;
+  }
+
+  fail(reason: string) {
+    this.status = "failed";
+    this.reason = reason;
+  }
 
   public serialize(): string {
     return JSON.stringify({
@@ -21,6 +30,17 @@ export class Task {
       goal: this.goal,
       actions: this.actions,
       status: this.status,
+      reason: this.reason,
     });
+  }
+
+  public asObject() {
+    return {
+      id: this.id,
+      goal: this.goal,
+      actions: this.actions,
+      status: this.status,
+      reason: this.reason,
+    };
   }
 }

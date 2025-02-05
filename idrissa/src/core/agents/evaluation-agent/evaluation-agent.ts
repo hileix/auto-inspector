@@ -16,7 +16,7 @@ export class EvaluationAgent {
     private readonly screenshotter: Screenshotter,
   ) {}
 
-  async evaluate(task: Task): Promise<EvaluationAgentResponse> {
+  async evaluateTaskCompletion(task: Task): Promise<EvaluationAgentResponse> {
     const systemMessage = new EvaluationAgentPrompt().getSystemMessage();
 
     const screenshotUrl = await this.screenshotter.takeScreenshot(

@@ -1,11 +1,4 @@
-import { ManagerAgentAction } from "@/core/agents/manager-agent/manager-agent.types";
-
-export interface Task {
-  id: string;
-  goal: string;
-  actions: ManagerAgentAction[];
-  status: "pending" | "completed" | "failed";
-}
+import { Task } from "@/core/entities/task";
 
 export class TaskManagerService {
   private tasks: Task[] = [];
@@ -21,44 +14,22 @@ export class TaskManagerService {
     return `${this.tasks.length + 1}`;
   }
 
-  addCompletedTask(task: Omit<Task, "id" | "status">) {
-    const index = this.tasks.findIndex((t) => t.goal === task.goal);
-
-    if (index === -1) {
-      this.tasks.push({
-        id: this.generateId(),
-        ...task,
-        status: "completed",
-      });
-    } else {
-      this.tasks[index]!.status = "completed";
-      this.tasks[index]!.actions = task.actions;
-    }
+  add(task: Task) {
+    this.tasks.push(task);
   }
 
-  addPendingTask(task: Omit<Task, "id" | "status">) {
-    this.tasks.push({
-      id: this.generateId(),
-      ...task,
-      status: "pending",
-    });
+  getLatestTask() {
+    return this.tasks[this.tasks.length - 1] ?? null;
   }
 
   getSerializedTasks() {
     return JSON.stringify({
       endGoal: this.endGoal,
-      latestTaskCompleted: this.tasks[this.tasks.length - 1] ?? null,
+      latestTaskCompleted: this.getLatestTask()?.asObject(),
     });
   }
 
   getTasksForReport() {
-    return this.tasks.map((task) => ({
-      goal: task.goal,
-      actions: task.actions.map((action) => ({
-        name: action.name,
-        status: task.status,
-      })),
-      status: task.status,
-    }));
+    return this.tasks.map((task) => task.asObject());
   }
 }
