@@ -91,6 +91,20 @@ npm run example
 npm run scenario -- --url="start-url" --user-story="As a user, I can <replace-with-your-user-story>"
 ```
 
+## Roadmap
+
+We're committed to improving the project, feel free to open an issue if you have any suggestions or feedback.
+
+| Component                | Status | Features                                                                                                                                    |
+|:-------------------------|:------:|---------------------------------------------------------------------------------------------------------------------------------------------|
+| Alpha release       |  ✅️️   | <ul><li>Release a first minimap version that is able to run a test</li></ul>                                                             |
+| Provide a GUI |    🏗️   | <ul><li>Add docker configuration</li><li>Add a simple UI to create a test</li></ul> |
+| Build a serious benchmark framework      |  🏗️  | <ul><li>The only serious way to improve the agent is to build a serious benchmark dedicated to the web testing.</li></ul>                              |
+| Improve the Agent's ability to test |  🏗️   | <ul><li>The evaluatior agent is still not reliable enough to give a feedback to the main agent.</li><li>We also need to improve the performance of the agent.</li></ul>                                                         |
+
+
+
+
 
 
 <p align="center">
@@ -104,3 +118,5 @@ npm run scenario -- --url="start-url" --user-story="As a user, I can <replace-wi
 <p align="center">
 .
 </p>
+
+
