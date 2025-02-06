@@ -76,7 +76,7 @@ echo OPENAI_API_KEY="<replace-with-your-key>" >> .env
 ### Run an example test case
 
 ```
-npm run start -- --url=https://www.ecosia.org/ --user-story="As a user, I can search for Magic Inspector and view web search results."
+npm run example
 ```
 
 ### Run your own test case
