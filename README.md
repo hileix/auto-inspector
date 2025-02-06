@@ -76,13 +76,13 @@ echo OPENAI_API_KEY="<replace-with-your-key>" >> .env
 ### Run an example test case
 
 ```
-npm run start:scenario -- --url="https://yahoo.com" --user-story="As a user, I can search for 'Magic Inspector' and open the website."
+npm run start -- --url=https://www.ecosia.org/ --user-story="As a user, I can search for Magic Inspector and view web search results."
 ```
 
 ### Run your own test case
 
 ```
-npm run scenario -- --url="start-url" --user-story='As a user, I can <replace-with-your-user-story>'
+npm run scenario -- --url="start-url" --user-story="As a user, I can <replace-with-your-user-story>"
 ```
 
 
