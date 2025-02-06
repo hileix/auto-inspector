@@ -44,6 +44,7 @@ Focus on planning your tests, we run them for you.
 
 Auto Inspector is <b>fully open-sourced (Apache 2.0)</b> and <a href="https://magicinspector.com">Magic Inspector</a> offers cloud hosting and dedicated enterprise grade support.
 
+
 ## Demo 
 
 User story: I can log in to my account with 'demo@magicinspector.com' and 'demopassword' and create a new test inside the Default Project. Once the test has been created, I can see the test editor.
@@ -67,7 +68,7 @@ https://github.com/user-attachments/assets/7873f6a8-89d5-4234-8a17-0d993f5dc5c7
 
 ```bash
 git clone https://github.com/magic-inspector/auto-inspector.git
-cd auto-inspector
+cd auto-inspector/auto-inspector
 
 npm install
 ```
