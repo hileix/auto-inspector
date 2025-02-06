@@ -10,26 +10,29 @@ if (!process.env.OPENAI_API_KEY) {
   process.exit(1);
 }
 
-export const startTest = new Command("test:start")
-  .description("Start a test execution")
+export const startTest = new Command("run:scenario")
+  .description("Run a test scenario")
   .option("-u, --url <URL>", "The webpage to start testing")
-  .option("-d, --description <DESCRIPTION>", "The description of the test")
-  .action(async (options: { url: string; description: string }) => {
+  .option(
+    "-s, --user-story <USER STORY DESCRIPTION>",
+    "The description of the user story to test",
+  )
+  .action(async (options: { url: string; userStory: string }) => {
     // const spinner = ora("Running tests...").start();
 
     const runTestCase = new RunTestCase();
 
     if (!options.url) {
-      //   spinner.fail("URL is required");
+      console.log("--url argument is required");
       return;
     }
 
-    if (!options.description) {
-      //   spinner.fail("Description is required");
+    if (!options.userStory) {
+      console.log("--user-story argument is required");
       return;
     }
 
-    const result = await runTestCase.execute(options.url, options.description);
+    const result = await runTestCase.execute(options.url, options.userStory);
 
     if (result.status === "success") {
       console.log("✅ Tests completed successfully!");

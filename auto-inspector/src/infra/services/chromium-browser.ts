@@ -15,7 +15,13 @@ export class ChromiumBrowser implements Browser {
     const browser = await chromium.launch({
       headless: false,
     });
-    this.page = await browser.newPage();
+    const context = await browser.newContext({
+      viewport: {
+        width: 1440,
+        height: 900,
+      },
+    });
+    this.page = await context.newPage();
     await this.getPage()!.goto(url);
   }
 

@@ -6,8 +6,9 @@
     "mycli": "dist/index.js"
   },
   "scripts": {
-    "start": "ts-node -r tsconfig-paths/register src/interfaces/cli/index.ts test:start",
-    "test": "npm run start -- --url=https://www.google.com --description='Test the search bar'",
+    "start": "ts-node -r tsconfig-paths/register src/interfaces/cli/index.ts run:scenario",
+    "example": "npm run start -- --url=https://www.ecosia.org/ --user-story='As a user, I can search for Magic Inspector and view web search results.'",
+    "scenario": "npm run start --",
     "clean": "rm -rf dist"
   },
   "author": "Kevin Piacentini <kevin@agentlabs.dev>",
