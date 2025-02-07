@@ -91,7 +91,7 @@ npm run example
 npm run scenario -- --url="start-url" --user-story="As a user, I can <replace-with-your-user-story>"
 ```
 
-## Roadmap
+## Roadmap for a stable release
 
 We're committed to improving the project, feel free to open an issue if you have any suggestions or feedback.
 
@@ -99,11 +99,11 @@ We're committed to improving the project, feel free to open an issue if you have
 |:-------------------------|:------:|---------------------------------------------------------------------------------------------------------------------------------------------|
 | Alpha release       |  ✅️️   | <ul><li>Release a first minimap version that is able to run a test</li></ul>      
 | Add support for variables and secrets       |  ✅️️    | <ul><li>The agent can take variables and secrets from the user story</li><li>Secrets are not displayed in the logs or sent to the LLM</li></ul> 
-| Improve agents       |  🏗️   | <ul><li>Add a first agent responsible of splitting the user story into a task to perform and an evaluation of the result</li></ul>                                                             |
+| Interrupt actions when dom changes |  🏗️   | <ul><li>We need to interrupt the action if the interactives elements change after one action</li></ul>
+| Wait page stabilized before evaluation |  🏗️   | <ul><li>The page evaluation should be done only after the page is stabilized to avoid false negatives</li></ul> 
+| Refine user inputs       |  🏗️   | <ul><li>We must make sure that the Manager Agent and the Evaluation Agent get distinct inputs so the Manager Agent does not try to update its behavior based on the expected result</li></ul>                                                             |
 | Provide a GUI |    🏗️   | <ul><li>Add docker configuration</li><li>Add a simple UI to create a test</li></ul> |
 | Build a serious benchmark framework      |  🏗️  | <ul><li>The only serious way to improve the agent is to build a serious benchmark dedicated to the web testing.</li></ul>                              |
-| Improve the Agent's ability to test |  🏗️   | <ul><li>The evaluatior agent is still not reliable enough to give a feedback to the main agent.</li><li>We also need to improve the performance of the agent.</li></ul>                                                         |
-
 
 
 
