@@ -96,11 +96,13 @@ export class ManagerAgent {
   }
 
   async launch(startUrl: string, initialPrompt: string) {
-    await this.browserService.launch(startUrl);
+    const vStartUrl = new VariableString(startUrl, this.variables);
 
-    const variableString = new VariableString(initialPrompt, this.variables);
+    await this.browserService.launch(vStartUrl.dangerousValue());
 
-    this.taskManager.setEndGoal(variableString.publicValue());
+    const vInitialPrompt = new VariableString(initialPrompt, this.variables);
+
+    this.taskManager.setEndGoal(vInitialPrompt.publicValue());
 
     return this.run();
   }
