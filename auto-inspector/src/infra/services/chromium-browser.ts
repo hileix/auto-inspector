@@ -1,3 +1,4 @@
+import { VariableString } from "@/core/entities/variable-string";
 import { Browser } from "@/core/interfaces/browser.interface";
 import { Page, chromium } from "playwright";
 
@@ -40,9 +41,9 @@ export class ChromiumBrowser implements Browser {
     return this.getPage().mouse.click(x, y);
   }
 
-  async fillInput(text: string, coordinates: Coordinates) {
+  async fillInput(text: VariableString, coordinates: Coordinates) {
     await this.getPage().mouse.click(coordinates.x, coordinates.y);
-    await this.getPage().keyboard.type(text, { delay: 100 });
+    await this.getPage().keyboard.type(text.dangerousValue(), { delay: 100 });
   }
 
   async scrollDown() {

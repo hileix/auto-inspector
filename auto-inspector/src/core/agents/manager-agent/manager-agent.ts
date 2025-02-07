@@ -16,10 +16,13 @@ import { Task } from "@/core/entities/task";
 import { LLM } from "@/core/interfaces/llm.interface";
 import { TestResult } from "@/core/entities/test-result";
 import { AgentReporter } from "@/core/interfaces/agent-reporter.interface";
+import { Variable } from "@/core/entities/variable";
+import { VariableString } from "@/core/entities/variable-string";
 
 export type ManagerAgentConfig = {
   maxActionsPerTask?: number;
   maxRetries?: number;
+  variables: Variable[];
 
   taskManager: TaskManagerService;
   domService: DomService;
@@ -34,6 +37,7 @@ export class ManagerAgent {
   private isFailure: boolean = false;
   private reason: string = "";
   private retries: number = 0;
+  private readonly variables: Variable[];
 
   private readonly maxActionsPerTask: number;
   private readonly maxRetries: number;
@@ -52,6 +56,7 @@ export class ManagerAgent {
     this.llmService = config.llmService;
     this.reporter = config.reporter;
     this.evaluator = config.evaluator;
+    this.variables = config.variables;
 
     this.maxActionsPerTask =
       config.maxActionsPerTask ?? DEFAULT_AGENT_MAX_ACTIONS_PER_TASK;
@@ -71,15 +76,11 @@ export class ManagerAgent {
   }
 
   private async beforeAction(action: ManagerAgentAction) {
-    this.reporter.loading(
-      `Performing action ${JSON.stringify(action.name)}...`,
-    );
+    this.reporter.loading(`Performing action ${action.name}...`);
   }
 
   private async afterAction(action: ManagerAgentAction) {
-    this.reporter.success(
-      `Performing action ${JSON.stringify(action.name)}...`,
-    );
+    this.reporter.success(`Performing action ${action.name}...`);
   }
 
   private async incrementRetries() {
@@ -97,7 +98,9 @@ export class ManagerAgent {
   async launch(startUrl: string, initialPrompt: string) {
     await this.browserService.launch(startUrl);
 
-    this.taskManager.setEndGoal(initialPrompt);
+    const variableString = new VariableString(initialPrompt, this.variables);
+
+    this.taskManager.setEndGoal(variableString.publicValue());
 
     return this.run();
   }
@@ -234,7 +237,12 @@ export class ManagerAgent {
         }
 
         await this.domService.highlightElementPointer(coordinates);
-        await this.browserService.fillInput(action.params.text, coordinates);
+        const variableString = new VariableString(
+          action.params.text,
+          this.variables,
+        );
+
+        await this.browserService.fillInput(variableString, coordinates);
         await this.domService.resetHighlightElements();
 
         break;

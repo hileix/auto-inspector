@@ -7,8 +7,9 @@
   },
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/interfaces/cli/index.ts run:scenario",
-    "example": "npm run start -- --url=https://www.ecosia.org/ --user-story='As a user, I can search for Magic Inspector and view web search results.'",
+    "example": "npm run start -- --url=https://www.ecosia.org/ --user-story='As a user, searching for Magic Inspector, I can see the results talking about Magic Inspector.'",
     "example:failure": "npm run start -- --url=https://www.ecosia.org/ --user-story='As a user searching for Magic Inspector, I can see the results talking about Bob Dylan.'",
+    "example:variables": "npm run start -- --url=https://app.magicinspector.com/ --user-story='As a user authenticated with {{user_email}} and {{user_password}}, I can see the dashboard.'",
     "scenario": "npm run start --",
     "clean": "rm -rf dist"
   },

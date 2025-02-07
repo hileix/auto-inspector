@@ -21,8 +21,8 @@ export class ManagerAgentPrompt {
   
      // Form filling
      actions: [
-        { "name": "fillInput", "params": { "index": 1, "text": "username" } },
-        { "name": "fillInput", "params": { "index": 2, "text": "password" } },
+        { "name": "fillInput", "params": { "index": 1, "text": "{{user_email}}" } },
+        { "name": "fillInput", "params": { "index": 2, "text": "{{user_password}}" } },
         { "name": "fillInput", "params": { "index": 5, "text": "13 street name, 123456 city, country" } },
         { "name": "fillInput", "params": { "index": 6, "text": "1234567890" } },
         { "name": "scrollDown", "params": {} },
@@ -51,6 +51,7 @@ export class ManagerAgentPrompt {
       - When the page is truncated, scroll down to view more elements especially if you are filling a form.
       - Trigger success means you have completed the task and we can ask the evaluator to evaluate the test result.
       - Trigger failure means you have failed the task and you don't know how to complete the scenario.
+      - Sometimes, the user will provide variables surrounded by double brackets {{}}. You should keep them exactly as they are, we will replace them with the actual value later.
   
   3. ELEMENT INTERACTION:
      - Only use indexes that exist in the provided element list.

@@ -1,4 +1,5 @@
 import { Page } from "playwright";
+import { VariableString } from "../entities/variable-string";
 
 export type Coordinates = {
   x: number;
@@ -10,7 +11,7 @@ export interface Browser {
   getPage(): Page;
   getPageUrl(): string;
   mouseClick(x: number, y: number): Promise<void>;
-  fillInput(text: string, coordinates: Coordinates): Promise<void>;
+  fillInput(text: VariableString, coordinates: Coordinates): Promise<void>;
   scrollDown(): Promise<void>;
   scrollUp(): Promise<void>;
   goToUrl(url: string): Promise<void>;

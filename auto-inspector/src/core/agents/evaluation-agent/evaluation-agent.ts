@@ -7,7 +7,6 @@ import { Browser } from "@/core/interfaces/browser.interface";
 import { Screenshotter } from "@/core/interfaces/screenshotter.interface";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import { EvaluationAgentResponse } from "./evaluation-agent.types";
-import { Reporter } from "@/core/interfaces/reporter.interface";
 import { AgentReporter } from "@/core/interfaces/agent-reporter.interface";
 
 export class EvaluationAgent {
@@ -46,7 +45,9 @@ export class EvaluationAgent {
     if (response.status === "passed") {
       this.reporter.success("Test result evaluated successfully");
     } else {
-      this.reporter.failure("Test result evaluation failed");
+      this.reporter.failure(
+        `Test result evaluation failed: ${response.reason}`,
+      );
     }
 
     return response;

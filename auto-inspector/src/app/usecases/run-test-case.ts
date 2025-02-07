@@ -11,6 +11,7 @@ import {
   DEFAULT_AGENT_MAX_RETRIES,
 } from "@/core/agents/manager-agent/manager-agent.config";
 import { OraReporter } from "@/infra/services/ora-reporter";
+import { Variable } from "@/core/entities/variable";
 
 export class RunTestCase {
   async execute(startUrl: string, initialPrompt: string) {
@@ -28,6 +29,18 @@ export class RunTestCase {
     );
 
     const managerAgent = new ManagerAgent({
+      variables: [
+        new Variable({
+          name: "user_email",
+          value: "demo@magicinspector.com",
+          isSecret: false,
+        }),
+        new Variable({
+          name: "user_password",
+          value: "demopassword",
+          isSecret: true,
+        }),
+      ],
       taskManager: new TaskManagerService(),
       domService: new DomService(screenshotService, browser),
       browserService: browser,
