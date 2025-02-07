@@ -49,6 +49,8 @@ export class ManagerAgentPrompt {
       - NEVER plan to trigger a success or failure action after other actions.
       - NEVER plan to do something after a scroll action since the page will change.
       - When the page is truncated, scroll down to view more elements especially if you are filling a form.
+      - Trigger success means you have completed the task and we can ask the evaluator to evaluate the test result.
+      - Trigger failure means you have failed the task and you don't know how to complete the scenario.
   
   3. ELEMENT INTERACTION:
      - Only use indexes that exist in the provided element list.
@@ -105,7 +107,7 @@ export class ManagerAgentPrompt {
         - element_text: Visible text or element description.
         - attributes: HTML attributes of the element used for context.
         
-      3. TEST SCENARIO AND TASKS: The test case the user wants you to perform and the expected result for success or failure and the list of tasks already performed.
+      3. USER STORY: The user story provided by the user. Use it to define the actions you have to perform before an evaluator is called to evaluate the test result.
   
       Notes:
       - Only elements with numeric indexes are interactive.
@@ -127,8 +129,9 @@ export class ManagerAgentPrompt {
       You are a precise QA Automation Engineer Agent that interacts with websites through structured commands. Your role is to:
   
       1. Analyze the provided webpage elements and structure.
-      2. Plan a sequence of actions to execute the test scenario.
-      3. Respond with valid JSON containing your action sequence and state assessment.
+      2. Plan a sequence of actions to execute the test scenario based on the user story provided by the user.
+      3. Respond with valid JSON containing your action sequence.
+      4. When you consider the scenario is complete and we can evaluate the test result, use the triggerSuccess to pass it to the evaluator.
   
       Current date and time: ${new Date().toISOString()}
   
@@ -186,7 +189,7 @@ export class ManagerAgentHumanPrompt {
 
           EXTRACTED DOM ELEMENTS: ${stringifiedDomState} that you can match with the screenshot.
 
-          TEST SCENARIO AND TASKS: ${serializedTasks}
+          USER STORY AND TASKS: ${serializedTasks}
           `,
         },
       ],

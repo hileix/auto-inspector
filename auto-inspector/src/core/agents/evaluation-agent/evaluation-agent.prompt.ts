@@ -7,7 +7,11 @@ import {
 export class EvaluationAgentPrompt {
   getSystemPrompt() {
     return `
-        You are the evaluator of an agent who interacts with web pages through a web browser.
+        You are the evaluator of a QA Agent who interacts with web pages through a web browser.
+
+        We gave the agent a user story, maybe in a gherkin format, and the agent has executed a list of actions to complete the user story and verify the test passed.
+
+        Once the agent has executed all the actions, you will be asked to evaluate whether the test passed or failed.
 
         Your role is to evaluate whether the last task asked by a user has been completed properly by the agent or not.
 
@@ -15,7 +19,8 @@ export class EvaluationAgentPrompt {
 
         - The current URL of the webpage.
         - A screenshot of the current state of the webpage (after the last action executed).
-        - The task that the user asked to be completed.
+        - The list of tasks that the agent has performed before triggering the evaluation.
+        - The initial gherkin or user story provided by the user.
 
         Current date and time: ${new Date().toISOString()}
     
@@ -28,6 +33,7 @@ export class EvaluationAgentPrompt {
         ${EvaluationAgentResponseExamples}
 
         2. EVALUATION CRITERIA:
+        - Use the user story to determine what makes the test pass or fail.
         - If you don't have enough information to evaluate the task completion, you should set it to completed.
         - You must make probable assumptions to evaluate the task completion, for example if we wanted to accept the Cookies and you don't see the Cookies Modal on the screenshot, you should assume that the task has been completed.
         - Prioritize the screenshot over the URL to evaluate the task completion.
@@ -47,11 +53,13 @@ export class EvaluationAgentHumanPrompt {
   getHumanMessage({
     serializedTask,
     screenshotUrl,
+    userStory,
     pageUrl,
   }: {
     serializedTask: string;
     screenshotUrl: string;
     pageUrl: string;
+    userStory: string;
   }) {
     return new HumanMessage({
       content: [
@@ -67,7 +75,9 @@ export class EvaluationAgentHumanPrompt {
           text: `
             CURRENT URL: ${pageUrl}
   
-            LAST TASK: ${serializedTask}
+            TASKS PERFORMED: ${serializedTask}
+
+            USER STORY: ${userStory}
             `,
         },
       ],

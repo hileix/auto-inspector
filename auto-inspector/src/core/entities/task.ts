@@ -21,9 +21,8 @@ export class Task {
     return this._reason;
   }
 
-  complete(reason: string) {
+  complete() {
     this._status = "completed";
-    this._reason = reason;
   }
 
   fail(reason: string) {

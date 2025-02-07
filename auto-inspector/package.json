@@ -8,6 +8,7 @@
   "scripts": {
     "start": "ts-node -r tsconfig-paths/register src/interfaces/cli/index.ts run:scenario",
     "example": "npm run start -- --url=https://www.ecosia.org/ --user-story='As a user, I can search for Magic Inspector and view web search results.'",
+    "example:failure": "npm run start -- --url=https://www.ecosia.org/ --user-story='As a user searching for Magic Inspector, I can see the results talking about Bob Dylan.'",
     "scenario": "npm run start --",
     "clean": "rm -rf dist"
   },

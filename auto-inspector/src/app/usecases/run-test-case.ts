@@ -19,12 +19,12 @@ export class RunTestCase {
     const browser = new ChromiumBrowser();
 
     const llm = new OpenAI4o();
-    const reporter = new OraReporter();
 
     const evaluationAgent = new EvaluationAgent(
       llm,
       browser,
       screenshotService,
+      new OraReporter("Evaluation Agent"),
     );
 
     const managerAgent = new ManagerAgent({
@@ -32,7 +32,7 @@ export class RunTestCase {
       domService: new DomService(screenshotService, browser),
       browserService: browser,
       llmService: llm,
-      reporter,
+      reporter: new OraReporter("Manager Agent"),
       evaluator: evaluationAgent,
       maxActionsPerTask: DEFAULT_AGENT_MAX_ACTIONS_PER_TASK,
       maxRetries: DEFAULT_AGENT_MAX_RETRIES,

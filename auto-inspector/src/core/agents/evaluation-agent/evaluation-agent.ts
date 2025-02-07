@@ -3,30 +3,38 @@ import {
   EvaluationAgentHumanPrompt,
   EvaluationAgentPrompt,
 } from "./evaluation-agent.prompt";
-import { Task } from "@/core/entities/task";
 import { Browser } from "@/core/interfaces/browser.interface";
 import { Screenshotter } from "@/core/interfaces/screenshotter.interface";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
 import { EvaluationAgentResponse } from "./evaluation-agent.types";
+import { Reporter } from "@/core/interfaces/reporter.interface";
+import { AgentReporter } from "@/core/interfaces/agent-reporter.interface";
 
 export class EvaluationAgent {
   constructor(
     private readonly llm: LLM,
     private readonly browser: Browser,
     private readonly screenshotter: Screenshotter,
+    private readonly reporter: AgentReporter,
   ) {}
 
-  async evaluateTaskCompletion(task: Task): Promise<EvaluationAgentResponse> {
+  async evaluateTestResult(
+    serializedTaskHistory: string,
+    userStory: string,
+  ): Promise<EvaluationAgentResponse> {
     const systemMessage = new EvaluationAgentPrompt().getSystemMessage();
 
     const screenshotUrl = await this.screenshotter.takeScreenshot(
       this.browser.getPage(),
     );
 
+    this.reporter.loading("Evaluating test result...");
+
     const humanMessage = new EvaluationAgentHumanPrompt().getHumanMessage({
-      serializedTask: task.serialize(),
+      serializedTask: serializedTaskHistory,
       pageUrl: this.browser.getPageUrl(),
       screenshotUrl,
+      userStory,
     });
 
     const parser = new JsonOutputParser<EvaluationAgentResponse>();
@@ -34,6 +42,12 @@ export class EvaluationAgent {
     const messages = [systemMessage, humanMessage];
 
     const response = await this.llm.invokeAndParse(messages, parser);
+
+    if (response.status === "passed") {
+      this.reporter.success("Test result evaluated successfully");
+    } else {
+      this.reporter.failure("Test result evaluation failed");
+    }
 
     return response;
   }

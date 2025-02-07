@@ -18,8 +18,6 @@ export const startTest = new Command("run:scenario")
     "The description of the user story to test",
   )
   .action(async (options: { url: string; userStory: string }) => {
-    // const spinner = ora("Running tests...").start();
-
     const runTestCase = new RunTestCase();
 
     if (!options.url) {
@@ -34,7 +32,7 @@ export const startTest = new Command("run:scenario")
 
     const result = await runTestCase.execute(options.url, options.userStory);
 
-    if (result.status === "success") {
+    if (result.status === "passed") {
       console.log("✅ Tests completed successfully!");
     } else {
       console.log("❌ Tests failed");

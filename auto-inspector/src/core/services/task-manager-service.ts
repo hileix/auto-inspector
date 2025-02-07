@@ -10,6 +10,10 @@ export class TaskManagerService {
     this.endGoal = endGoal;
   }
 
+  getEndGoal() {
+    return this.endGoal!;
+  }
+
   generateId() {
     return `${this.tasks.length + 1}`;
   }

@@ -10,11 +10,12 @@ import {
   DEFAULT_AGENT_MAX_RETRIES,
 } from "./manager-agent.config";
 import { ManagerAgentAction, ManagerResponse } from "./manager-agent.types";
-import { Reporter } from "@/core/interfaces/reporter.interface";
 import { Browser, Coordinates } from "@/core/interfaces/browser.interface";
 import { EvaluationAgent } from "../evaluation-agent/evaluation-agent";
 import { Task } from "@/core/entities/task";
 import { LLM } from "@/core/interfaces/llm.interface";
+import { TestResult } from "@/core/entities/test-result";
+import { AgentReporter } from "@/core/interfaces/agent-reporter.interface";
 
 export type ManagerAgentConfig = {
   maxActionsPerTask?: number;
@@ -25,7 +26,7 @@ export type ManagerAgentConfig = {
   browserService: Browser;
   llmService: LLM;
   evaluator: EvaluationAgent;
-  reporter: Reporter;
+  reporter: AgentReporter;
 };
 
 export class ManagerAgent {
@@ -41,7 +42,7 @@ export class ManagerAgent {
   private readonly domService: DomService;
   private readonly browserService: Browser;
   private readonly llmService: LLM;
-  private readonly reporter: Reporter;
+  private readonly reporter: AgentReporter;
   private readonly evaluator: EvaluationAgent;
 
   constructor(config: ManagerAgentConfig) {
@@ -64,29 +65,21 @@ export class ManagerAgent {
   }
 
   private onFailure(reason: string) {
-    this.reporter.error(`Manager agent failed: ${reason}`);
+    this.reporter.failure(`Manager agent failed: ${reason}`);
     this.isFailure = true;
     this.reason = reason;
   }
 
-  private async info(message: string) {
-    this.reporter.info(message);
-  }
-
-  private async reportAction(action: ManagerAgentAction) {
-    this.info(`[Performing action...]: ${JSON.stringify(action.name)}`);
-  }
-
-  private async reportActionDone(action: ManagerAgentAction) {
-    this.info(`[Action done...]: ${JSON.stringify(action.name)}`);
-  }
-
   private async beforeAction(action: ManagerAgentAction) {
-    await this.reportAction(action);
+    this.reporter.loading(
+      `Performing action ${JSON.stringify(action.name)}...`,
+    );
   }
 
   private async afterAction(action: ManagerAgentAction) {
-    await this.reportActionDone(action);
+    this.reporter.success(
+      `Performing action ${JSON.stringify(action.name)}...`,
+    );
   }
 
   private async incrementRetries() {
@@ -109,35 +102,51 @@ export class ManagerAgent {
     return this.run();
   }
 
-  async run(): Promise<{
-    status: "success" | "failure";
-    reason: string;
-  }> {
+  async run(): Promise<TestResult> {
     return new Promise(async (resolve) => {
-      this.reporter?.info("Starting manager agent");
+      this.reporter.loading("Starting manager agent");
 
       while (!this.isCompleted) {
         if (this.retries >= this.maxRetries) {
           this.onFailure("Max retries reached");
 
           return resolve({
-            status: "failure",
-            reason: "Max retries reached",
+            status: "failed",
+            reason:
+              "Max number of retried reached. The agent was not able to complete the test.",
           });
         }
 
-        await this.reporter.reportProgress(true);
+        this.reporter.loading("Defining next task...");
 
         const task = await this.defineNextTask();
 
-        await this.reporter.reportProgress(false, task);
+        this.reporter.loading(`Executing task: ${task.goal}`);
 
         await this.executeTask(task);
       }
 
+      /**
+       * If the Manager Agent failed, then we return the failure reason immediately.
+       */
+      if (this.isFailure) {
+        return resolve({
+          status: "failed",
+          reason: this.reason,
+        });
+      }
+
+      /**
+       * If the Manager Agent completed the task, then we evaluate the test result.
+       */
+      const { status, reason } = await this.evaluator.evaluateTestResult(
+        this.taskManager.getSerializedTasks(),
+        this.taskManager.getEndGoal(),
+      );
+
       return resolve({
-        status: this.isSuccess ? "success" : "failure",
-        reason: this.reason,
+        status,
+        reason,
       });
     });
   }
@@ -181,25 +190,17 @@ export class ManagerAgent {
     for (const action of task.actions) {
       try {
         await this.executeAction(action);
-      } catch (error) {
-        console.log("Error executing action", error);
+        task.complete();
+        this.resetRetries();
+      } catch (error: any) {
+        task.fail(error?.message ?? "Unknown error");
+        this.incrementRetries();
       }
-    }
-
-    const { isCompleted, reason } =
-      await this.evaluator.evaluateTaskCompletion(task);
-
-    if (isCompleted) {
-      task.complete(reason);
-      this.resetRetries();
-    } else {
-      task.fail(reason);
-      this.incrementRetries();
     }
 
     this.taskManager.add(task);
 
-    this.reporter.reportProgress(false, task);
+    this.reporter.success(task.goal);
   }
 
   private async executeAction(action: ManagerAgentAction) {

@@ -37,18 +37,26 @@ export const ManagerAgentActionSchema = z
     z.object({
       name: z.literal("takeScreenshot"),
     }),
-    z.object({
-      name: z.literal("triggerSuccess"),
-      params: z.object({
-        reason: z.string(),
-      }),
-    }),
-    z.object({
-      name: z.literal("triggerFailure"),
-      params: z.object({
-        reason: z.string(),
-      }),
-    }),
+    z
+      .object({
+        name: z.literal("triggerSuccess"),
+        params: z.object({
+          reason: z.string(),
+        }),
+      })
+      .describe(
+        "Trigger success means you have completed the user story and we can ask the evaluator to evaluate the test result.",
+      ),
+    z
+      .object({
+        name: z.literal("triggerFailure"),
+        params: z.object({
+          reason: z.string(),
+        }),
+      })
+      .describe(
+        "Trigger failure means you have failed to complete the user story and you don't know how to complete the scenario. You may be stuck somewhere, explain it.",
+      ),
   ])
   .describe(
     'The action to be executed. e.g. { name: "clickElement", params: { index: "login button" } }',

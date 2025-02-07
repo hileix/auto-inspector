@@ -3,13 +3,13 @@ import { zodToJsonSchema } from "zod-to-json-schema";
 
 export const EvaluationAgentResponseSchema = z
   .object({
-    isCompleted: z
-      .boolean()
-      .describe("Whether you think the task has been completed or not."),
-    reason: z.string().describe("The reason for the completion or failure."),
+    status: z
+      .enum(["passed", "failed"])
+      .describe("Whether you think the test has passed or failed."),
+    reason: z.string().describe("The reason for the success or failure."),
   })
   .describe(
-    'The result of your evaluation e.g. { isCompleted: true, reason: "The task has been completed." }',
+    'The result of your evaluation e.g. { status: "passed", reason: "The test has passed." }',
   );
 
 export type EvaluationAgentResponse = z.infer<
@@ -23,19 +23,19 @@ export const JsonifiedEvaluationAgentResponseSchema = JSON.stringify(
 export const EvaluationAgentResponseExamples = `
 Example Response 1:
 {
-  "isCompleted": true,
-  "reason": "The task has been completed."
+  "status": "passed",
+  "reason": "The test has passed."
 }
 
 Example Response 2:
 {
-  "isCompleted": false,
-  "reason": "The firstName input is still empty."
+  "status": "failed",
+  "reason": "The user story wanted to see dog results, but displayed car results instead."
 }
 
 Example Response 3:
 {
-  "isCompleted": false,
-  "reason": "The popup is still visible and has not been closed."
+  "status": "failed",
+  "reason": "The user story wanted to display a success message, but displayed an error message instead."
 }
 `;
