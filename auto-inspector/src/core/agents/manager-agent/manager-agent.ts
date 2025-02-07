@@ -33,6 +33,7 @@ export type ManagerAgentConfig = {
 };
 
 export class ManagerAgent {
+  private lastDomStateHash: string | null = null;
   private isSuccess: boolean = false;
   private isFailure: boolean = false;
   private reason: string = "";
@@ -156,6 +157,13 @@ export class ManagerAgent {
     });
   }
 
+  private async didDomStateChange() {
+    const { domStateHash: currentDomStateHash } =
+      await this.domService.getInteractiveElements(false);
+
+    return this.lastDomStateHash !== currentDomStateHash;
+  }
+
   /**
    * Ensures that the triggerSuccess and triggerFailure actions are never called among other actions.
    * This is important because we need to reevaluate actions and ensure that the success or failure
@@ -181,8 +189,10 @@ export class ManagerAgent {
       this.maxActionsPerTask,
     ).getSystemMessage();
 
-    const { screenshot, stringifiedDomState } =
+    const { screenshot, stringifiedDomState, domStateHash } =
       await this.domService.getInteractiveElements();
+
+    this.lastDomStateHash = domStateHash;
 
     const humanMessage = new ManagerAgentHumanPrompt().getHumanMessage({
       serializedTasks: this.taskManager.getSerializedTasks(),
@@ -216,6 +226,12 @@ export class ManagerAgent {
   async executeTask(task: Task) {
     for (const action of task.actions) {
       try {
+        if (await this.didDomStateChange()) {
+          task.cancel("Dom state changed, need to reevaluate.");
+          this.reporter.info("Dom state changed, need to reevaluate.");
+          return;
+        }
+
         await this.executeAction(action);
         task.complete();
         this.resetRetries();

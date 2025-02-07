@@ -1,6 +1,7 @@
 import { Page } from "playwright";
 import { Browser } from "@/core/interfaces/browser.interface";
 import { Screenshotter } from "@/core/interfaces/screenshotter.interface";
+import crypto from "crypto";
 
 declare global {
   interface Window {
@@ -84,6 +85,50 @@ export class DomService {
     private readonly browserService: Browser,
   ) {}
 
+  /**
+   * For this version of the dom state string with only keep the index and tag name
+   * because it is frequent that an attribute or the content of the node changes
+   * and we don't want to re-run the action for such a small change.
+   *
+   * Ouput format: [2]__<div></div>
+   */
+  private stringifyDomStateForHash(nodeState: DomNode | null) {
+    const items: string[] = [];
+
+    const format = (node: DomNode | null) => {
+      if (!isElementNode(node)) {
+        return;
+      }
+
+      if (node.highlightIndex) {
+        // [2]__<div></div>
+        const str = `[${node.isInteractive ? node.highlightIndex : ""}]__<${node.tagName}>`;
+
+        items.push(str);
+      }
+
+      for (const child of node.children) {
+        if (child) {
+          format(child);
+        }
+      }
+    };
+
+    format(nodeState);
+
+    return items.join("\n");
+  }
+
+  private hashDomState(domState: DomNode | null) {
+    if (!domState) {
+      return "";
+    }
+
+    const domStateString = this.stringifyDomStateForHash(domState);
+
+    return crypto.createHash("sha256").update(domStateString).digest("hex");
+  }
+
   getIndexSelector(index: number): Coordinates | null {
     const domNode = this.domContext?.selectorMap[index];
 
@@ -98,8 +143,10 @@ export class DomService {
     return domNode.coordinates;
   }
 
-  async getDomState(): Promise<SerializedDomState> {
-    const state = await this.highlightForSoM();
+  async getDomState(
+    withHighlight: boolean = true,
+  ): Promise<SerializedDomState> {
+    const state = await this.highlightForSoM(withHighlight);
     const screenshot = await this.screenshotService.takeScreenshot(
       this.browserService.getPage(),
     );
@@ -107,14 +154,21 @@ export class DomService {
     return { screenshot, domState: state };
   }
 
-  async getInteractiveElements() {
-    const { screenshot, domState } = await this.getDomState();
+  async getInteractiveElements(withHighlight: boolean = true) {
+    const { screenshot, domState } = await this.getDomState(withHighlight);
     const selectorMap = this.createSelectorMap(domState);
     const stringifiedDomState = this.stringifyDomState(domState);
+    const domStateHash = this.hashDomState(domState);
 
     this.domContext.selectorMap = selectorMap;
 
-    return { screenshot, domState, selectorMap, stringifiedDomState };
+    return {
+      screenshot,
+      domState,
+      selectorMap,
+      stringifiedDomState,
+      domStateHash,
+    };
   }
 
   createSelectorMap(nodeState: DomNode | null) {
@@ -243,7 +297,9 @@ export class DomService {
     await page.waitForTimeout(1500);
   }
 
-  async highlightForSoM(): Promise<DomNode | null> {
+  async highlightForSoM(
+    withHighlight: boolean = true,
+  ): Promise<DomNode | null> {
     try {
       const page: Page = this.browserService.getPage();
 
@@ -253,7 +309,7 @@ export class DomService {
 
       await this.waitForStability(page);
 
-      const domState: DomNode | null = await page.evaluate(() => {
+      const domState: DomNode | null = await page.evaluate((withHighlight) => {
         const doHighlightElements = true;
         const focusHighlightIndex = -1;
         const viewportExpansion: 0 | -1 = 0;
@@ -265,6 +321,10 @@ export class DomService {
           index: number,
           parentIframe: HTMLIFrameElement | null = null,
         ) {
+          if (!withHighlight) {
+            return;
+          }
+
           let container = document.getElementById(
             "playwright-highlight-container",
           );
@@ -710,16 +770,11 @@ export class DomService {
           };
         }
 
-        console.log(" DOM SAT2E");
-
         function buildDomTree(
           node: Element,
           parentIframe: HTMLIFrameElement | null = null,
         ): DomNode | null {
-          console.log("buildDomTree", node.tagName);
           if (!node) return null;
-
-          console.log("buildDomTree", node.tagName);
 
           // Special case for text nodes
           if (node.nodeType === Node.TEXT_NODE) {
@@ -830,12 +885,10 @@ export class DomService {
           return nodeData as DomNode;
         }
 
-        console.log("buildDomTree");
-
         const domTree = buildDomTree(document.body);
 
         return domTree;
-      });
+      }, withHighlight);
 
       return domState;
     } catch (error: unknown) {

@@ -100,7 +100,7 @@ We're committed to improving the project, feel free to open an issue if you have
 | Alpha release       |  ✅️️   | <ul><li>Release a first minimap version that is able to run a test</li></ul>      
 | Add support for variables and secrets       |  ✅️️    | <ul><li>The agent can take variables and secrets from the user story</li><li>Secrets are not displayed in the logs or sent to the LLM</li></ul> 
 | Run multiple cases from a test file       |  ✅️️    | <ul><li>Check the `npm run example:file` command for more information</li></ul> 
-| Interrupt actions when dom changes |  🏗️   | <ul><li>We need to interrupt the action if the interactives elements change after one action</li></ul>
+| Interrupt actions when dom changes |  ✅️  | <ul><li>We need to interrupt the action if the interactives elements change after one action</li></ul>
 | Wait page stabilized before evaluation |  🏗️   | <ul><li>The page evaluation should be done only after the page is stabilized to avoid false negatives</li></ul> 
 | Refine user inputs       |  🏗️   | <ul><li>We must make sure that the Manager Agent and the Evaluation Agent get distinct inputs so the Manager Agent does not try to update its behavior based on the expected result</li></ul>                                                             |
 | Provide a GUI |    🏗️   | <ul><li>Add docker configuration</li><li>Add a simple UI to create a test</li></ul> |
