@@ -46,13 +46,36 @@ export class ManagerAgentPrompt {
         { "name": "fillInput", "params": { "index": "accept", "text": "password" } },        
       ]
   
-      - NEVER plan to trigger a success or failure action after other actions.
+      - NEVER plan to trigger a success or failure action among other actions, you should always trigger a success or failure action alone.
       - NEVER plan to do something after a scroll action since the page will change.
       - When the page is truncated, scroll down to view more elements especially if you are filling a form.
       - Trigger success means you have completed the task and we can ask the evaluator to evaluate the test result.
       - Trigger failure means you have failed the task and you don't know how to complete the scenario.
       - Sometimes, the user will provide variables surrounded by double brackets {{}}. You should keep them exactly as they are, we will replace them with the actual value later.
-  
+
+      Wrong example (trigger success among other actions):
+
+      actions: [
+        { "name": "fillInput", "params": { "index": 1, "text": "{{user_email}}" } },
+        { "name": "fillInput", "params": { "index": 2, "text": "{{user_password}}" } },
+        { "name": "clickElement", "params": { "index": 2 } },
+        { "name": "triggerSuccess", "params": { "reason": "Form filled" } },
+      ]
+
+      Correct example (trigger success alone):
+
+      actions: [
+        { "name": "fillInput", "params": { "index": 1, "text": "{{user_email}}" } },
+        { "name": "fillInput", "params": { "index": 2, "text": "{{user_password}}" } },
+        { "name": "clickElement", "params": { "index": 2 } },
+      ]
+
+      [... later if you believe the task is completed ...]
+
+      actions: [
+        { "name": "triggerSuccess", "params": { "reason": "Form filled" } },
+      ]
+
   3. ELEMENT INTERACTION:
      - Only use indexes that exist in the provided element list.
      - Each element has a unique index number (e.g., "[33]__<button></button>").

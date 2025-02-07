@@ -156,6 +156,24 @@ export class ManagerAgent {
     });
   }
 
+  /**
+   * Ensures that the triggerSuccess and triggerFailure actions are never called among other actions.
+   * This is important because we need to reevaluate actions and ensure that the success or failure
+   * actions are executed alone to properly determine the test result.
+   */
+  private ensureNoTriggerSuccessOrFailureAmongOtherActions(
+    actions: ManagerAgentAction[],
+  ) {
+    if (actions.length < 2) {
+      return actions;
+    }
+
+    return actions.filter(
+      (action) =>
+        action.name !== "triggerSuccess" && action.name !== "triggerFailure",
+    );
+  }
+
   async defineNextTask(): Promise<Task> {
     const parser = new JsonOutputParser<ManagerResponse>();
 
@@ -181,9 +199,13 @@ export class ManagerAgent {
         parser,
       );
 
+      const safeActions = this.ensureNoTriggerSuccessOrFailureAmongOtherActions(
+        parsedResponse.actions,
+      );
+
       return Task.InitPending(
         parsedResponse.currentState.nextGoal,
-        parsedResponse.actions,
+        safeActions,
       );
     } catch (error) {
       console.error("Error parsing agent response:", error);
