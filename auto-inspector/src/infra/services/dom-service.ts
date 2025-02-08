@@ -51,10 +51,8 @@ const IMPORTANT_ATTRIBUTES = [
   "role",
   "for",
   "href",
-  "src",
   "alt",
   "title",
-  "class",
   "data-testid",
   "data-test",
   "data-test-id",
@@ -823,7 +821,7 @@ export class DomService {
             nodeData.isInteractive = isInteractive;
             nodeData.isVisible = isVisible;
             nodeData.isTopElement = isTop;
-            nodeData.text = node.textContent?.trim() ?? "";
+            nodeData.text = "";
             nodeData.coordinates = coordinates;
 
             if (isInteractive && isVisible && isTop) {

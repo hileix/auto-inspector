@@ -48,6 +48,7 @@ export class ManagerAgentPrompt {
   
       - NEVER plan to trigger a success or failure action among other actions, you should always trigger a success or failure action alone.
       - NEVER plan to do something after a scroll action since the page will change.
+      - NEVER plan to scroll down or up if there is a cookie popup or any constent popup on screen. First accept or close the popup.
       - When the page is truncated, scroll down to view more elements especially if you are filling a form.
       - Trigger success means you have completed the task and we can ask the evaluator to evaluate the test result.
       - Trigger failure means you have failed the task and you don't know how to complete the scenario.
