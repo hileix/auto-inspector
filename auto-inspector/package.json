@@ -11,6 +11,7 @@
     "example:failure": "npm run start -- --url=https://www.ecosia.org/ --user-story='As a user searching for Magic Inspector, I can see the results talking about Bob Dylan.'",
     "example:variables": "npm run start -- --url=https://app.magicinspector.com/ --user-story='As a user authenticated with {{user_email}} and {{user_password}}, I can see the dashboard.'",
     "example:file": "npm run start -- --file=../examples/passing-cases.json",
+    "example:voyager": "npm run start -- --file=../examples/taia-voyager.json",
     "scenario": "npm run start --",
     "clean": "rm -rf dist"
   },

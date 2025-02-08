@@ -1,0 +1,44 @@
+{
+    "context": {
+        "variables": [
+            {
+                "name": "main_url",
+                "value": "https://app.magicinspector.com/",
+                "is_secret": false
+            },
+            {
+                "name": "user_email",
+                "value": "demo@magicinspector.com",
+                "is_secret": false
+            },
+            {
+                "name": "user_password",
+                "value": "demopassword",
+                "is_secret": true
+            }
+        ]
+    },
+    "cases": [
+        {
+            "category": "impossible",
+            "web_name": "Allrecipes",
+            "id": "Allrecipes--2",
+            "start_url": "https://www.allrecipes.com/",
+            "user_story": "Feature: Lasagna page\n Given I am on the {{vegie_lasagna_page}} page \n and scrolled to the ingredients section\n Then I should see the ingredients list\n"
+        },
+        {
+            "category": "impossible",
+            "web_name": "Allrecipes",
+            "id": "Allrecipes--1",
+            "start_url": "https://www.allrecipes.com/",
+            "user_story": "Feature: Search and view Lasagna\n Given I have searched for 'vegeratian lasagna'\n and clicked on the reciped named 'Easy Vegentaria Spinach Lasagna'\n Then I should see the recipe details including the ingredients, name and picture\n"
+        },
+        {
+            "category": "possible",
+            "web_name": "Allrecipes",
+            "id": "Allrecipes--0",
+            "start_url": "https://www.allrecipes.com/",
+            "user_story": "Feature: Vegetarian Lasagna Search\n Given I am on the Allrecipes website\n    When I search for 'vegetarian lasagna'\n    Then I should see a list of recipes\n    And at least one recipe should have more than 100 reviews\n    And the rating should be at least 4.5 stars\n"
+          }
+      ]
+}

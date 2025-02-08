@@ -115,6 +115,7 @@ export class ManagerAgentPrompt {
      - Only provide the action sequence until you think the page will change.
      - Try to be efficient, e.g. fill forms at once, or chain actions where nothing changes on the page like saving, extracting, checkboxes...
      - only use multiple actions if it makes sense.
+     - After you have scrolled down or up, you should always ask yourself if you achieved your goal. If not, you should scroll down or up again.
   
       Use a maximum of ${this.maxActionPerStep} actions per task.
   `;
@@ -166,8 +167,8 @@ export class ManagerAgentPrompt {
       Functions:
       - clickElement: { index: <element_index> }
       - fillInput: { index: <element_index>, text: <text> }
-      - scrollDown: { }
-      - scrollUp: { }
+      - scrollDown: { goal: <goal> }
+      - scrollUp: { goal: <goal> }
       - goToUrl: { url: <url> }    
       - triggerSuccess: { reason: <reason> }
       - triggerFailure: { reason: <reason> }

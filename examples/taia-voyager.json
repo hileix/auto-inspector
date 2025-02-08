@@ -1,0 +1,34 @@
+{
+    "context": {
+        "variables": [
+            {   
+                "name": "vegie_lasagna_page",
+                "value": "https://www.allrecipes.com/recipe/229764/easy-vegetarian-spinach-lasagna/",
+                "is_secret": false
+            }
+        ]
+    },
+    "cases": [
+        {
+            "category": "possible",
+            "web_name": "Allrecipes",
+            "id": "Allrecipes--2",
+            "start_url": "https://www.allrecipes.com/",
+            "user_story": "Feature: Lasagna page\n Given I am on the {{vegie_lasagna_page}} page \n and scrolled two times down\n Then I should see the ingredients list\n"
+        },
+        {
+            "category": "possible",
+            "web_name": "Allrecipes",
+            "id": "Allrecipes--1",
+            "start_url": "https://www.allrecipes.com/",
+            "user_story": "Feature: Search and view Lasagna\n Given I have searched for 'vegeratian lasagna'\n and clicked on the reciped named 'Easy Vegentaria Spinach Lasagna'\n Then I should see the recipe details including the name 'Easy Vegentaria Spinach Lasagna'\n"
+        },
+        {
+            "category": "possible",
+            "web_name": "Allrecipes",
+            "id": "Allrecipes--0",
+            "start_url": "https://www.allrecipes.com/",
+            "user_story": "Feature: Vegetarian Lasagna Search\n Given I am on the Allrecipes website\n    When I search for 'vegetarian lasagna'\n    Then I should see a list of recipes\n    And at least one recipe should have more than 100 reviews\n    And the rating should be at least 4.5 stars\n"
+          }
+      ]
+}

@@ -18,9 +18,19 @@ export const ManagerAgentActionSchema = z
     }),
     z.object({
       name: z.literal("scrollDown"),
+      goal: z
+        .string()
+        .describe(
+          "The goal you want to achieve after scrolling down. This will be used to evaluate if you have achieved your goal or if you need to scroll down again.",
+        ),
     }),
     z.object({
       name: z.literal("scrollUp"),
+      goal: z
+        .string()
+        .describe(
+          "The goal you want to achieve after scrolling up. This will be used to evaluate if you have achieved your goal or if you need to scroll up again.",
+        ),
     }),
     z.object({
       name: z.literal("goToUrl"),
@@ -108,6 +118,6 @@ Example Response 3:
     "memory": "We need to scroll down to find the login form. End goal is to login to my account.",
     "nextGoal": "Scroll down to find the login form."
   },
-  "actions": [{"name": "scrollDown"}]
+  "actions": [{"name": "scrollDown", "goal": "find the login form"}]
 }
 `;

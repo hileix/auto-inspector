@@ -142,6 +142,8 @@ export class ManagerAgent {
         });
       }
 
+      await this.domService.resetHighlightElements();
+
       /**
        * If the Manager Agent completed the task, then we evaluate the test result.
        */
@@ -157,7 +159,11 @@ export class ManagerAgent {
     });
   }
 
+  /**
+   * Depending on the website dom states are too often, we need to find an alternative.
+   */
   private async didDomStateChange() {
+    return false;
     const { domStateHash: currentDomStateHash } =
       await this.domService.getInteractiveElements(false);
 
