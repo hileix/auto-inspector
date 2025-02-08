@@ -33,6 +33,7 @@ export type ManagerAgentConfig = {
 };
 
 export class ManagerAgent {
+  private msDelayBetweenActions: number = 1000;
   private lastDomStateHash: string | null = null;
   private isSuccess: boolean = false;
   private isFailure: boolean = false;
@@ -215,10 +216,14 @@ export class ManagerAgent {
         parsedResponse.actions,
       );
 
-      return Task.InitPending(
+      const task = Task.InitPending(
         parsedResponse.currentState.nextGoal,
         safeActions,
       );
+
+      this.taskManager.add(task);
+
+      return task;
     } catch (error) {
       console.error("Error parsing agent response:", error);
       return Task.InitPending("Keep trying", []);
@@ -226,19 +231,33 @@ export class ManagerAgent {
   }
 
   async executeTask(task: Task) {
+    await this.domService.resetHighlightElements();
+
     for (const [i, action] of task.actions.entries()) {
       try {
         if (i > 0 && (await this.didDomStateChange())) {
+          this.taskManager.cancel(
+            task,
+            "Dom state changed, need to reevaluate.",
+          );
           task.cancel("Dom state changed, need to reevaluate.");
           this.reporter.info("Dom state changed, need to reevaluate.");
           return;
         }
 
         await this.executeAction(action);
-        task.complete();
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, this.msDelayBetweenActions),
+        );
+
+        this.taskManager.complete(task);
         this.resetRetries();
       } catch (error: any) {
-        task.fail(error?.message ?? "Unknown error");
+        this.taskManager.fail(
+          task,
+          `Task failed with error: ${error?.message ?? "Unknown error"}`,
+        );
         this.incrementRetries();
       }
     }

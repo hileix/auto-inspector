@@ -5,7 +5,7 @@ export class Task {
     public readonly id: string,
     public readonly goal: string,
     readonly actions: ManagerAgentAction[],
-    private _status: "pending" | "completed" | "failed" | "cancelled",
+    private _status: "pending" | "completed" | "failed" | "partially_completed",
     private _reason: string | undefined = undefined,
   ) {}
 
@@ -22,7 +22,7 @@ export class Task {
   }
 
   cancel(reason: string) {
-    this._status = "cancelled";
+    this._status = "partially_completed";
     this._reason = reason;
   }
 

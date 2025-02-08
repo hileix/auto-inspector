@@ -146,7 +146,7 @@ export class DomService {
   ): Promise<SerializedDomState> {
     const state = await this.highlightForSoM(withHighlight);
     const screenshot = await this.screenshotService.takeScreenshot(
-      this.browserService.getPage(),
+      await this.browserService.getStablePage(),
     );
 
     return { screenshot, domState: state };
@@ -219,7 +219,8 @@ export class DomService {
   }
 
   async resetHighlightElements() {
-    await this.browserService.getPage().evaluate(() => {
+    const page = await this.browserService.getStablePage();
+    await page.evaluate(() => {
       try {
         // Remove the highlight container and all its contents
         const container = document.getElementById(
@@ -243,13 +244,15 @@ export class DomService {
   }
 
   async highlightElementWheel(direction: "down" | "up") {
-    await this.browserService.getPage().evaluate((direction: "down" | "up") => {
+    const page = await this.browserService.getStablePage();
+    await page.evaluate((direction: "down" | "up") => {
       console.log("highlightElementWheel", direction);
     }, direction);
   }
 
   async highlightElementPointer(coordinates: Coordinates) {
-    await this.browserService.getPage().evaluate((coordinates: Coordinates) => {
+    const page = await this.browserService.getStablePage();
+    await page.evaluate((coordinates: Coordinates) => {
       try {
         // Create or get highlight container
         let container = document.getElementById(
@@ -299,7 +302,7 @@ export class DomService {
     withHighlight: boolean = true,
   ): Promise<DomNode | null> {
     try {
-      const page: Page = this.browserService.getPage();
+      const page: Page = await this.browserService.getStablePage();
 
       if (page.isClosed()) {
         return null;

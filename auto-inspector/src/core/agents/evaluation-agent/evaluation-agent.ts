@@ -23,9 +23,8 @@ export class EvaluationAgent {
   ): Promise<EvaluationAgentResponse> {
     const systemMessage = new EvaluationAgentPrompt().getSystemMessage();
 
-    const screenshotUrl = await this.screenshotter.takeScreenshot(
-      this.browser.getPage(),
-    );
+    const page = await this.browser.getStablePage();
+    const screenshotUrl = await this.screenshotter.takeScreenshot(page);
 
     this.reporter.loading("Evaluating test result...");
 

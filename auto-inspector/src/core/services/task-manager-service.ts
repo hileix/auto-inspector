@@ -22,6 +22,18 @@ export class TaskManagerService {
     this.tasks.push(task);
   }
 
+  cancel(task: Task, reason: string) {
+    task.cancel(reason);
+  }
+
+  complete(task: Task) {
+    task.complete();
+  }
+
+  fail(task: Task, reason: string) {
+    task.fail(reason);
+  }
+
   getLatestTask() {
     return this.tasks[this.tasks.length - 1] ?? null;
   }

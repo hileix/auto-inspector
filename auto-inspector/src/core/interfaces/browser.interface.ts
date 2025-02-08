@@ -8,6 +8,7 @@ export type Coordinates = {
 
 export interface Browser {
   launch(url: string): Promise<void>;
+  getStablePage(): Promise<Page>;
   getPage(): Page;
   getPageUrl(): string;
   mouseClick(x: number, y: number): Promise<void>;

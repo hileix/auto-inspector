@@ -101,7 +101,10 @@ We're committed to improving the project, feel free to open an issue if you have
 | Add support for variables and secrets       |  ✅️️    | <ul><li>The agent can take variables and secrets from the user story</li><li>Secrets are not displayed in the logs or sent to the LLM</li></ul> 
 | Run multiple cases from a test file       |  ✅️️    | <ul><li>Check the `npm run example:file` command for more information</li></ul> 
 | Interrupt actions when dom changes |  ✅️  | <ul><li>We need to interrupt the action if the interactives elements change after one action</li></ul>
-| Wait page stabilized before evaluation |  🏗️   | <ul><li>The page evaluation should be done only after the page is stabilized to avoid false negatives</li></ul> 
+| Wait page stabilized before evaluation |  ✅️   | <ul><li>Wait for the domContentLoaded event to be fired</li><li>Wait for a minimal time to make sure the page is stable</li></ul> 
+| Manage completion at the action level  | 🏗️   | <ul><li>We must manage completion at the action level insted of the task level to make sure the agent does not restart filling inputs over and over</li></ul>
+| Manager multiple tabs  | 🏗️   | <ul><li>We must listen to the tab events and manage the tabs</li></ul> 
+| Persist voyager results in file       |  🏗️   | <ul><li>we need to persist screenshots and results in a file for every test we run</li></ul>     
 | Refine user inputs       |  🏗️   | <ul><li>We must make sure that the Manager Agent and the Evaluation Agent get distinct inputs so the Manager Agent does not try to update its behavior based on the expected result</li></ul>                                                             |
 | Provide a GUI |    🏗️   | <ul><li>Add docker configuration</li><li>Add a simple UI to create a test</li></ul> |
 | Build a serious benchmark framework      |  🏗️  | <ul><li>The only serious way to improve the agent is to build a serious benchmark dedicated to the web testing.</li></ul>                              |

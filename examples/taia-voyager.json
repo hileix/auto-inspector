@@ -12,6 +12,20 @@
         {
             "category": "possible",
             "web_name": "Allrecipes",
+            "id": "Allrecipes--1",
+            "start_url": "https://www.allrecipes.com/",
+            "user_story": "Feature: Search and view Lasagna\n Given I have searched for 'vegeratian lasagna'\n and clicked on the reciped named 'Easy Vegentaria Spinach Lasagna'\n Then I should see the recipe details including the name 'Easy Vegentaria Spinach Lasagna'\n"
+        },
+        {
+            "category": "possible",
+            "web_name": "Amazon",
+            "id": "Amazon--3",
+            "start_url": "https://www.amazon.com/",
+            "user_story": "Given I am on the Amazon website\n when I searched for Xbox Wireless Controller\n Then I can open the first product and see the details\n"            
+        },
+        {
+            "category": "possible",
+            "web_name": "Allrecipes",
             "id": "Allrecipes--2",
             "start_url": "https://www.allrecipes.com/",
             "user_story": "Feature: Lasagna page\n Given I am on the {{vegie_lasagna_page}} page \n and scrolled two times down\n Then I should see the ingredients list\n"

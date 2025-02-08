@@ -1,6 +1,6 @@
 import { VariableString } from "@/core/entities/variable-string";
 import { Browser } from "@/core/interfaces/browser.interface";
-import { Page, chromium } from "playwright";
+import { BrowserContext, Page, chromium } from "playwright";
 
 export type Coordinates = {
   x: number;
@@ -9,6 +9,9 @@ export type Coordinates = {
 
 export class ChromiumBrowser implements Browser {
   private page: Page | null = null;
+  private context: BrowserContext | null = null;
+
+  private minimumPageLoadTime: number = 600;
 
   constructor() {}
 
@@ -16,19 +19,43 @@ export class ChromiumBrowser implements Browser {
     const browser = await chromium.launch({
       headless: false,
     });
-    const context = await browser.newContext({
+    this.context = await browser.newContext({
       viewport: {
         width: 1440,
         height: 900,
       },
     });
-    this.page = await context.newPage();
+
+    this.page = await this.context.newPage();
     await this.getPage()!.goto(url);
+  }
+
+  private async waitForDomContentLoaded() {
+    await this.getPage().waitForLoadState("domcontentloaded");
+  }
+
+  private async waitMinimumPageLoadTime() {
+    return new Promise((resolve) =>
+      setTimeout(resolve, this.minimumPageLoadTime),
+    );
+  }
+
+  private async waitForStability() {
+    return Promise.all([
+      this.waitForDomContentLoaded(),
+      this.waitMinimumPageLoadTime(),
+    ]);
+  }
+
+  async getStablePage(): Promise<Page> {
+    await this.waitForStability();
+
+    return this.getPage();
   }
 
   getPage(): Page {
     if (!this.page) {
-      throw new Error("Page not initialized");
+      throw new Error("The page is not initialized or has been detroyed.");
     }
     return this.page;
   }
