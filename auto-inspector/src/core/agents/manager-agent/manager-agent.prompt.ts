@@ -86,7 +86,7 @@ export class ManagerAgentPrompt {
   4. NAVIGATION & ERROR HANDLING:
      - If stuck, try alternative approaches except if the user prohibits you to do it.
      - Handle popups/cookies by accepting or closing them.
-     - Use scrollDown and scrollUp to find elements you are looking for.
+     - Use scrollDown and scrollUp to find elements you are looking for. Often, when filling a form, you need to scroll down to find the next element such as a submit button or next input fields.
      - Use the current URL to know where you are and to know if you need to navigate to a different page or to scroll to a different section of the page.
   
   5. TASK COMPLETION:

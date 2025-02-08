@@ -159,11 +159,7 @@ export class ManagerAgent {
     });
   }
 
-  /**
-   * Depending on the website dom states are too often, we need to find an alternative.
-   */
   private async didDomStateChange() {
-    return false;
     const { domStateHash: currentDomStateHash } =
       await this.domService.getInteractiveElements(false);
 
@@ -230,9 +226,9 @@ export class ManagerAgent {
   }
 
   async executeTask(task: Task) {
-    for (const action of task.actions) {
+    for (const [i, action] of task.actions.entries()) {
       try {
-        if (await this.didDomStateChange()) {
+        if (i > 0 && (await this.didDomStateChange())) {
           task.cancel("Dom state changed, need to reevaluate.");
           this.reporter.info("Dom state changed, need to reevaluate.");
           return;

@@ -1,24 +1,21 @@
 {
     "context": {
         "variables": [
-            {
-                "name": "main_url",
-                "value": "https://app.magicinspector.com/",
+            {   
+                "name": "vegie_lasagna_page",
+                "value": "https://www.allrecipes.com/recipe/229764/easy-vegetarian-spinach-lasagna/",
                 "is_secret": false
-            },
-            {
-                "name": "user_email",
-                "value": "demo@magicinspector.com",
-                "is_secret": false
-            },
-            {
-                "name": "user_password",
-                "value": "demopassword",
-                "is_secret": true
             }
         ]
     },
     "cases": [
+        {
+            "category": "impossible",
+            "web_name": "Allrecipes",
+            "id": "Allrecipes--3",
+            "start_url": "https://www.allrecipes.com/",
+            "user_story": "Feature: Leave a review\n Given I am on the {{vegie_lasagna_page}} page\n I can fill the review form (without submitting)\n Then I should see the review form filled\n"
+        },
         {
             "category": "impossible",
             "web_name": "Allrecipes",
