@@ -14,24 +14,12 @@ export class TaskManagerService {
     return this.endGoal!;
   }
 
-  generateId() {
-    return `${this.tasks.length + 1}`;
-  }
-
   add(task: Task) {
     this.tasks.push(task);
   }
 
-  cancel(task: Task, reason: string) {
-    task.cancel(reason);
-  }
-
-  complete(task: Task) {
-    task.complete();
-  }
-
-  fail(task: Task, reason: string) {
-    task.fail(reason);
+  update(task: Task) {
+    this.tasks = this.tasks.map((t) => (t.id === task.id ? task : t));
   }
 
   getLatestTask() {

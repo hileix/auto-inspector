@@ -12,7 +12,7 @@ import {
 import { ManagerAgentAction, ManagerResponse } from "./manager-agent.types";
 import { Browser, Coordinates } from "@/core/interfaces/browser.interface";
 import { EvaluationAgent } from "../evaluation-agent/evaluation-agent";
-import { Task } from "@/core/entities/task";
+import { Task, TaskAction } from "@/core/entities/task";
 import { LLM } from "@/core/interfaces/llm.interface";
 import { TestResult } from "@/core/entities/test-result";
 import { AgentReporter } from "@/core/interfaces/agent-reporter.interface";
@@ -77,12 +77,12 @@ export class ManagerAgent {
     this.reason = reason;
   }
 
-  private async beforeAction(action: ManagerAgentAction) {
-    this.reporter.loading(`Performing action ${action.name}...`);
+  private async beforeAction(action: TaskAction) {
+    this.reporter.loading(`Performing action ${action.data.name}...`);
   }
 
-  private async afterAction(action: ManagerAgentAction) {
-    this.reporter.success(`Performing action ${action.name}...`);
+  private async afterAction(action: TaskAction) {
+    this.reporter.success(`Performing action ${action.data.name}...`);
   }
 
   private async incrementRetries() {
@@ -236,28 +236,33 @@ export class ManagerAgent {
     for (const [i, action] of task.actions.entries()) {
       try {
         if (i > 0 && (await this.didDomStateChange())) {
-          this.taskManager.cancel(
-            task,
-            "Dom state changed, need to reevaluate.",
-          );
+          action.cancel("Dom state changed, need to reevaluate.");
           task.cancel("Dom state changed, need to reevaluate.");
+          this.taskManager.update(task);
           this.reporter.info("Dom state changed, need to reevaluate.");
           return;
         }
 
         await this.executeAction(action);
+        action.complete();
 
         await new Promise((resolve) =>
           setTimeout(resolve, this.msDelayBetweenActions),
         );
 
-        this.taskManager.complete(task);
+        task.complete();
+        this.taskManager.update(task);
+
         this.resetRetries();
       } catch (error: any) {
-        this.taskManager.fail(
-          task,
+        action.fail(
           `Task failed with error: ${error?.message ?? "Unknown error"}`,
         );
+        task.fail(
+          `Task failed with error: ${error?.message ?? "Unknown error"}`,
+        );
+
+        this.taskManager.update(task);
         this.incrementRetries();
       }
     }
@@ -267,14 +272,16 @@ export class ManagerAgent {
     this.reporter.success(task.goal);
   }
 
-  private async executeAction(action: ManagerAgentAction) {
+  private async executeAction(action: TaskAction) {
     let coordinates: Coordinates | null = null;
 
     await this.beforeAction(action);
 
-    switch (action.name) {
+    switch (action.data.name) {
       case "clickElement":
-        coordinates = this.domService.getIndexSelector(action.params.index);
+        coordinates = this.domService.getIndexSelector(
+          action.data.params.index,
+        );
 
         if (!coordinates) {
           throw new Error("Index or coordinates not found");
@@ -291,7 +298,9 @@ export class ManagerAgent {
         break;
 
       case "fillInput":
-        coordinates = this.domService.getIndexSelector(action.params.index);
+        coordinates = this.domService.getIndexSelector(
+          action.data.params.index,
+        );
 
         if (!coordinates) {
           throw new Error("Index or coordinates not found");
@@ -299,7 +308,7 @@ export class ManagerAgent {
 
         await this.domService.highlightElementPointer(coordinates);
         const variableString = new VariableString(
-          action.params.text,
+          action.data.params.text,
           this.variables,
         );
 
@@ -329,15 +338,15 @@ export class ManagerAgent {
         break;
 
       case "goToUrl":
-        await this.browserService.goToUrl(action.params.url);
+        await this.browserService.goToUrl(action.data.params.url);
         break;
 
       case "triggerSuccess":
-        this.onSuccess(action.params.reason);
+        this.onSuccess(action.data.params.reason);
         break;
 
       case "triggerFailure":
-        this.onFailure(action.params.reason);
+        this.onFailure(action.data.params.reason);
         break;
     }
 
