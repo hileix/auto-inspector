@@ -82,7 +82,7 @@ echo OPENAI_API_KEY="<replace-with-your-key>" >> .env
 ### Run an example test case
 
 ```
-npm run example
+npm run example:voyager
 ```
 
 ### Run your own test case
