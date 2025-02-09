@@ -16,6 +16,13 @@
     "cases": [
         {
             "category": "possible",
+            "web_name": "Apple",
+            "id": "Apple--0",
+            "start_url": "https://www.apple.com/",
+            "user_story": "Given I am on the Apple website\n When I view the latest Macbook Pro\n Then I should be able to view the page to compare macbooks\n"
+        },
+        {
+            "category": "possible",
             "web_name": "Amazon",
             "id": "Amazon--6",
             "start_url": "https://www.amazon.com/",

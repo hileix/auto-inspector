@@ -11,6 +11,13 @@
     "cases": [
         {
             "category": "impossible",
+            "web_name": "Apple",
+            "id": "Apple--0",
+            "start_url": "https://www.apple.com/",
+            "user_story": "Given I am on the Apple website\n When I view the latest Macbook Pro\n Then I should be able to add it to my cart\n"
+        },
+        {
+            "category": "impossible",
             "web_name": "Allrecipes",
             "id": "Allrecipes--3",
             "start_url": "https://www.allrecipes.com/",
