@@ -38,7 +38,3 @@ coverage/
 # Ignore temporary files
 tmp/
 temp/
-
-# Ignore lock files
-package-lock.json
-yarn.lock
