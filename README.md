@@ -47,6 +47,12 @@ Auto Inspector is <b>fully open-sourced (Apache 2.0)</b> and <a href="https://ma
 
 ## Demo 
 
+### GUI VERSION
+
+https://github.com/user-attachments/assets/98881b79-eb63-4d10-aedf-f52ad64aecd5
+
+### CLI VERSION
+
 User story: I can log in to my account with 'demo@magicinspector.com' and 'demopassword' and create a new test inside the Default Project. Once the test has been created, I can see the test editor.
 
 https://github.com/user-attachments/assets/7873f6a8-89d5-4234-8a17-0d993f5dc5c7
@@ -62,10 +68,10 @@ https://github.com/user-attachments/assets/7873f6a8-89d5-4234-8a17-0d993f5dc5c7
 ℹ️ Note: Auto Inspector is currently in development and not ready to self-host. If you're looking for an enterprise-grade testing solution, check our **[Cloud Version](https://magicinspector.com)**.
 
 Auto Inspector is available as a CLI utility and as a web application.
-- The web version is the easiest way to get started if you just to play with the agent.
+- The GUI web version is the easiest way to get started if you just to play with the agent.
 - The CLI is probably more adapted to improve the agent and add new features to the core.
 
-### Web UI Version
+### GUI Version
 
 #### Prerequisites
 
