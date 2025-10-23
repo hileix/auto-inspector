@@ -32,6 +32,7 @@
     "commander": "^13.1.0",
     "dotenv": "^16.4.7",
     "langchain": "^0.3.15",
+    "openai": "^6.6.0",
     "ora-classic": "^5.4.2",
     "playwright": "^1.50.1",
     "reflect-metadata": "^0.2.0",
