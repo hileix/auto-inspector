@@ -10,6 +10,7 @@ export class OpenAI4o implements LLM {
   constructor() {
     this.client = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY!,
+      baseURL: 'https://api.poe.com/v1'
     });
   }
 
