@@ -1,16 +1,17 @@
-import OpenAI from "openai";
-import "dotenv/config";
-import { LLM } from "@/core/interfaces/llm.interface";
+import { ChatOpenAI } from "@langchain/openai";
 import { BaseMessage } from "@langchain/core/messages";
 import { JsonOutputParser } from "@langchain/core/output_parsers";
+import "dotenv/config";
+import { LLM } from "@/core/interfaces/llm.interface";
 
 export class OpenAI4o implements LLM {
-  private client: OpenAI;
+  private model: ChatOpenAI;
 
   constructor() {
-    this.client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY!,
-      baseURL: 'https://api.poe.com/v1'
+    this.model = new ChatOpenAI({
+      model: "gpt-4o",
+      temperature: 0,
+      openAIApiKey: process.env.OPENAI_API_KEY!,
     });
   }
 
@@ -18,20 +19,8 @@ export class OpenAI4o implements LLM {
     messages: BaseMessage[],
     parser: JsonOutputParser<T>,
   ): Promise<T> {
-    const completion = await this.client.chat.completions.create({
-      model: "Gemini-2.5-Pro",
-      temperature: 0,
-      messages: messages.map((msg) => ({
-        role: msg._getType() as "user" | "assistant" | "system",
-        content: msg.content as string,
-      })),
-    });
+    const response = await this.model.invoke(messages);
 
-    const content = completion.choices[0].message.content;
-    if (!content) {
-      throw new Error("No response content from OpenAI");
-    }
-
-    return parser.invoke({ content } as any);
+    return parser.invoke(response);
   }
 }
