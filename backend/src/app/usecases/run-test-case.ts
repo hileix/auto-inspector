@@ -12,20 +12,33 @@ import {
 } from '@/core/agents/manager-agent/manager-agent.config';
 import { OraReporter } from '@/infra/services/ora-reporter';
 import { Variable } from '@/core/entities/variable';
+import { AgentReporter } from '@/core/interfaces/agent-reporter.interface';
+
+export type RunTestCaseOptions = {
+  managerAgentReporter?: AgentReporter;
+  evaluationAgentReporter?: AgentReporter;
+};
 
 export class RunTestCase {
-  async execute(startUrl: string, initialPrompt: string) {
+  async execute(
+    startUrl: string,
+    initialPrompt: string,
+    options?: RunTestCaseOptions,
+  ) {
     const fileSystem = new InMemoryFileSystem();
     const screenshotService = new PlaywrightScreenshoter(fileSystem);
     const browser = new ChromiumBrowser();
 
     const llm = new OpenAI4o();
 
+    const managerReporter = options?.managerAgentReporter || new OraReporter('Manager Agent');
+    const evaluatorReporter = options?.evaluationAgentReporter || new OraReporter('Evaluation Agent');
+
     const evaluationAgent = new EvaluationAgent(
       llm,
       browser,
       screenshotService,
-      new OraReporter('Evaluation Agent'),
+      evaluatorReporter,
     );
 
     const managerAgent = new ManagerAgent({
@@ -45,7 +58,7 @@ export class RunTestCase {
       domService: new DomService(screenshotService, browser),
       browserService: browser,
       llmService: llm,
-      reporter: new OraReporter('Manager Agent'),
+      reporter: managerReporter,
       evaluator: evaluationAgent,
       maxActionsPerTask: DEFAULT_AGENT_MAX_ACTIONS_PER_TASK,
       maxRetries: DEFAULT_AGENT_MAX_RETRIES,
